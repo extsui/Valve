@@ -72,12 +72,12 @@ $EndComp
 $Comp
 L Connector:Conn_01x06_Male CN2
 U 1 1 61C0B8EC
-P 1750 5100
-F 0 "CN2" H 1723 5073 50  0000 R CNN
-F 1 "ST-LINK" H 1723 4982 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 1750 5100 50  0001 C CNN
-F 3 "~" H 1750 5100 50  0001 C CNN
-	1    1750 5100
+P 3450 6850
+F 0 "CN2" H 3423 6823 50  0000 R CNN
+F 1 "ST-LINK" H 3423 6732 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 3450 6850 50  0001 C CNN
+F 3 "~" H 3450 6850 50  0001 C CNN
+	1    3450 6850
 	-1   0    0    -1  
 $EndComp
 $Comp
@@ -111,27 +111,27 @@ NoConn ~ 7500 5350
 NoConn ~ 7600 5350
 NoConn ~ 7700 5350
 NoConn ~ 7800 5350
-Text GLabel 1300 4900 0    50   Input ~ 0
+Text GLabel 3000 6650 0    50   Input ~ 0
 VDD
-Text GLabel 1300 5000 0    50   Input ~ 0
+Text GLabel 3000 6750 0    50   Input ~ 0
 SWCLK
-Text GLabel 1300 5100 0    50   Input ~ 0
+Text GLabel 3000 6850 0    50   Input ~ 0
 GND
-Text GLabel 1300 5200 0    50   Input ~ 0
+Text GLabel 3000 6950 0    50   Input ~ 0
 SWDIO
-Text GLabel 1300 5300 0    50   Input ~ 0
+Text GLabel 3000 7050 0    50   Input ~ 0
 NRST
-NoConn ~ 1550 5400
+NoConn ~ 3250 7150
 Wire Wire Line
-	1300 4900 1550 4900
+	3000 6650 3250 6650
 Wire Wire Line
-	1550 5000 1300 5000
+	3250 6750 3000 6750
 Wire Wire Line
-	1300 5100 1550 5100
+	3000 6850 3250 6850
 Wire Wire Line
-	1550 5200 1300 5200
+	3250 6950 3000 6950
 Wire Wire Line
-	1300 5300 1550 5300
+	3000 7050 3250 7050
 $Comp
 L extsui:STM32L010F4P6 U1
 U 1 1 61C0D105
@@ -374,28 +374,6 @@ TXD
 NoConn ~ 10000 3650
 Text Notes 9150 4200 0    50   ~ 0
 The TTL-232R-3V3 module pin#3  is 5V.\nThis system is 3V3, so pin#3 is NC.
-$Comp
-L Device:Jumper_NO_Small JP1
-U 1 1 61C572FE
-P 10200 1350
-F 0 "JP1" H 10200 1535 50  0000 C CNN
-F 1 "I2C_ADDR_A0" H 10200 1444 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 10200 1350 50  0001 C CNN
-F 3 "~" H 10200 1350 50  0001 C CNN
-	1    10200 1350
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:Jumper_NO_Small JP2
-U 1 1 61C57349
-P 10200 1650
-F 0 "JP2" H 10200 1835 50  0000 C CNN
-F 1 "I2C_ADDR_A1" H 10200 1744 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 10200 1650 50  0001 C CNN
-F 3 "~" H 10200 1650 50  0001 C CNN
-	1    10200 1650
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	7400 3950 7400 4150
 Wire Wire Line
@@ -525,11 +503,11 @@ Power Flag
 Text Notes 800  3250 0    50   ~ 0
 Power Supply over I2C (3V3)
 Wire Notes Line
-	800  3300 800  4400
+	800  3300 800  5650
 Wire Notes Line
-	800  4400 2200 4400
+	800  5650 2200 5650
 Wire Notes Line
-	2200 4400 2200 3300
+	2200 5650 2200 3300
 Wire Notes Line
 	2200 3300 800  3300
 $Comp
@@ -656,13 +634,13 @@ Connection ~ 3700 1750
 Wire Wire Line
 	3700 1750 3700 1650
 Wire Notes Line
-	2200 5600 800  5600
+	3900 7350 2500 7350
 Wire Notes Line
-	800  5600 800  4700
+	2500 7350 2500 6450
 Wire Notes Line
-	800  4700 2200 4700
+	2500 6450 3900 6450
 Wire Notes Line
-	2200 4700 2200 5600
+	3900 6450 3900 7350
 Wire Notes Line
 	11000 5950 11000 3300
 Wire Notes Line
@@ -672,11 +650,11 @@ Wire Notes Line
 Wire Notes Line
 	8900 5950 11000 5950
 Wire Wire Line
-	10300 1350 10800 1350
+	10600 1250 10800 1250
 Wire Wire Line
-	10800 1350 10800 1650
+	10800 1250 10800 1650
 Wire Wire Line
-	10300 1650 10800 1650
+	10600 1650 10800 1650
 Connection ~ 10800 1650
 Wire Wire Line
 	10800 1650 10800 1900
@@ -692,10 +670,10 @@ F 3 "" H 10800 1900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10100 1350 9750 1350
+	10000 1250 9750 1250
 Wire Wire Line
-	10100 1650 9750 1650
-Text Label 9750 1350 0    50   ~ 0
+	10000 1650 9750 1650
+Text Label 9750 1250 0    50   ~ 0
 PA1
 Text Label 9750 1650 0    50   ~ 0
 PB9
@@ -4677,7 +4655,7 @@ Text Label 4500 2450 0    50   ~ 0
 USART2_TX
 Text Label 4500 2250 0    50   ~ 0
 USART2_RX
-Text Notes 800  4650 0    50   ~ 0
+Text Notes 2500 6400 0    50   ~ 0
 Debugger
 Wire Notes Line
 	8650 5950 2500 5950
@@ -4709,45 +4687,28 @@ Wire Notes Line
 	11000 2200 11000 800 
 Wire Notes Line
 	11000 800  9600 800 
-Text Notes 9750 950  0    50   ~ 0
-Use Internal pull-up of IC.
 Text Notes 9600 750  0    50   ~ 0
-I2C Slave Address (2bit)
-Wire Notes Line
-	10450 1100 9950 1100
-Wire Notes Line
-	10200 1000 10200 1100
-$Comp
-L Connector:Conn_01x02_Male J1
-U 1 1 61C6BFB2
-P 950 2200
-F 0 "J1" H 1200 2500 50  0000 C CNN
-F 1 "Conn_01x02_Male" H 1200 2400 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 950 2200 50  0001 C CNN
-F 3 "~" H 950 2200 50  0001 C CNN
-	1    950  2200
-	1    0    0    -1  
-$EndComp
+LEDs for Debug
 $Comp
 L Device:C_Small C1
 U 1 1 61C6C2A7
-P 1500 2400
-F 0 "C1" H 1592 2446 50  0000 L CNN
-F 1 "0.1u" H 1592 2355 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm" H 1500 2400 50  0001 C CNN
-F 3 "~" H 1500 2400 50  0001 C CNN
-	1    1500 2400
+P 1100 2350
+F 0 "C1" H 1192 2396 50  0000 L CNN
+F 1 "0.1u" H 1192 2305 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm" H 1100 2350 50  0001 C CNN
+F 3 "~" H 1100 2350 50  0001 C CNN
+	1    1100 2350
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:CP_Small C2
 U 1 1 61C6D6C3
-P 1900 2400
-F 0 "C2" H 1988 2446 50  0000 L CNN
-F 1 "47u" H 1988 2355 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 1900 2400 50  0001 C CNN
-F 3 "~" H 1900 2400 50  0001 C CNN
-	1    1900 2400
+P 1500 2350
+F 0 "C2" H 1588 2396 50  0000 L CNN
+F 1 "47u" H 1588 2305 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 1500 2350 50  0001 C CNN
+F 3 "~" H 1500 2350 50  0001 C CNN
+	1    1500 2350
 	1    0    0    -1  
 $EndComp
 Wire Notes Line
@@ -4761,41 +4722,105 @@ Wire Notes Line
 $Comp
 L power:GND #PWR0107
 U 1 1 61C98924
-P 1500 2700
-F 0 "#PWR0107" H 1500 2450 50  0001 C CNN
-F 1 "GND" H 1505 2527 50  0000 C CNN
-F 2 "" H 1500 2700 50  0001 C CNN
-F 3 "" H 1500 2700 50  0001 C CNN
-	1    1500 2700
+P 1100 2700
+F 0 "#PWR0107" H 1100 2450 50  0001 C CNN
+F 1 "GND" H 1105 2527 50  0000 C CNN
+F 2 "" H 1100 2700 50  0001 C CNN
+F 3 "" H 1100 2700 50  0001 C CNN
+	1    1100 2700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1500 2500 1500 2600
+	1100 2450 1100 2550
 Wire Wire Line
-	1900 2600 1500 2600
+	1500 2550 1100 2550
 Wire Wire Line
-	1500 2600 1500 2700
-Connection ~ 1500 2600
+	1100 2550 1100 2700
+Connection ~ 1100 2550
 Wire Wire Line
-	1900 2200 1900 2300
-Connection ~ 1900 2200
+	1500 2150 1500 2250
 Wire Wire Line
-	1900 2200 1500 2200
+	1500 2150 1100 2150
 Wire Wire Line
-	1150 2600 1500 2600
-Wire Wire Line
-	1900 2600 1900 2500
+	1500 2550 1500 2450
 Text Notes 800  1650 0    50   ~ 0
 Power
-Text GLabel 1900 2000 1    50   Input ~ 0
+Text GLabel 1100 2000 1    50   Input ~ 0
 VDD
 Wire Wire Line
-	1900 2000 1900 2200
+	1100 2000 1100 2150
 Wire Wire Line
-	1150 2300 1150 2600
+	1100 2150 1100 2250
+$Comp
+L Device:R R1
+U 1 1 61D4C863
+P 10150 1250
+F 0 "R1" V 10050 1250 50  0000 C CNN
+F 1 "1k" V 10150 1250 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 10080 1250 50  0001 C CNN
+F 3 "~" H 10150 1250 50  0001 C CNN
+	1    10150 1250
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED LED1
+U 1 1 61D4CAA3
+P 10450 1250
+F 0 "LED1" H 10450 1100 50  0000 C CNN
+F 1 "LED" H 10442 1086 50  0001 C CNN
+F 2 "LED_THT:LED_D3.0mm" H 10450 1250 50  0001 C CNN
+F 3 "~" H 10450 1250 50  0001 C CNN
+	1    10450 1250
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 61D5834E
+P 10150 1650
+F 0 "R2" V 10050 1650 50  0000 C CNN
+F 1 "1k" V 10150 1650 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 10080 1650 50  0001 C CNN
+F 3 "~" H 10150 1650 50  0001 C CNN
+	1    10150 1650
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED LED2
+U 1 1 61D58355
+P 10450 1650
+F 0 "LED2" H 10450 1500 50  0000 C CNN
+F 1 "LED" H 10442 1486 50  0001 C CNN
+F 2 "LED_THT:LED_D3.0mm" H 10450 1650 50  0001 C CNN
+F 3 "~" H 10450 1650 50  0001 C CNN
+	1    10450 1650
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:Conn_01x04_Male J1
+U 1 1 61D809D8
+P 1000 4900
+F 0 "J1" H 1100 5250 50  0000 C CNN
+F 1 "Conn_01x04_Male" H 1250 5150 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 1000 4900 50  0001 C CNN
+F 3 "~" H 1000 4900 50  0001 C CNN
+	1    1000 4900
+	1    0    0    -1  
+$EndComp
+Connection ~ 1100 2150
+Text GLabel 1800 5000 2    50   Input ~ 0
+SCL
+Text GLabel 1800 5100 2    50   Input ~ 0
+SDA
+Text GLabel 1800 4800 2    50   Input ~ 0
+GND
 Wire Wire Line
-	1500 2200 1500 2300
-Connection ~ 1500 2200
+	1800 4800 1200 4800
 Wire Wire Line
-	1500 2200 1150 2200
+	1200 4900 1800 4900
+Wire Wire Line
+	1800 5100 1200 5100
+Text GLabel 1800 4900 2    50   Input ~ 0
+VDD
+Wire Wire Line
+	1800 5000 1200 5000
 $EndSCHEMATC
