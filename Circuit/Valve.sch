@@ -59,10 +59,10 @@ F 3 "" H 7600 4850 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Connector:Conn_01x06_Male CN3
+L Connector:Conn_01x06_Male CN4
 U 1 1 61C0B87F
 P 10200 3650
-F 0 "CN3" H 10173 3623 50  0000 R CNN
+F 0 "CN4" H 10173 3623 50  0000 R CNN
 F 1 "TTL-232R-3V3" H 10173 3532 50  0000 R CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 10200 3650 50  0001 C CNN
 F 3 "~" H 10200 3650 50  0001 C CNN
@@ -70,25 +70,25 @@ F 3 "~" H 10200 3650 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x06_Male CN2
+L Connector:Conn_01x06_Male CN3
 U 1 1 61C0B8EC
-P 3450 6850
-F 0 "CN2" H 3423 6823 50  0000 R CNN
-F 1 "ST-LINK" H 3423 6732 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 3450 6850 50  0001 C CNN
-F 3 "~" H 3450 6850 50  0001 C CNN
-	1    3450 6850
+P 1750 6650
+F 0 "CN3" H 1723 6623 50  0000 R CNN
+F 1 "ST-LINK" H 1723 6532 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 1750 6650 50  0001 C CNN
+F 3 "~" H 1750 6650 50  0001 C CNN
+	1    1750 6650
 	-1   0    0    -1  
 $EndComp
 $Comp
 L Connector_Generic:Conn_01x04 CN1
 U 1 1 61C0B9C7
-P 1000 3800
-F 0 "CN1" H 920 4117 50  0000 C CNN
-F 1 "GROVE" H 920 4026 50  0000 C CNN
-F 2 "OPL_Connector:HW4-2.0-90D" H 1000 3800 50  0001 C CNN
-F 3 "~" H 1000 3800 50  0001 C CNN
-	1    1000 3800
+P 1050 4350
+F 0 "CN1" H 970 4667 50  0000 C CNN
+F 1 "GROVE" H 970 4576 50  0000 C CNN
+F 2 "OPL_Connector:HW4-2.0-90D" H 1050 4350 50  0001 C CNN
+F 3 "~" H 1050 4350 50  0001 C CNN
+	1    1050 4350
 	-1   0    0    -1  
 $EndComp
 NoConn ~ 2900 5350
@@ -111,27 +111,27 @@ NoConn ~ 7500 5350
 NoConn ~ 7600 5350
 NoConn ~ 7700 5350
 NoConn ~ 7800 5350
-Text GLabel 3000 6650 0    50   Input ~ 0
+Text GLabel 1300 6450 0    50   Input ~ 0
 VDD
-Text GLabel 3000 6750 0    50   Input ~ 0
+Text GLabel 1300 6550 0    50   Input ~ 0
 SWCLK
-Text GLabel 3000 6850 0    50   Input ~ 0
+Text GLabel 1300 6650 0    50   Input ~ 0
 GND
-Text GLabel 3000 6950 0    50   Input ~ 0
+Text GLabel 1300 6750 0    50   Input ~ 0
 SWDIO
-Text GLabel 3000 7050 0    50   Input ~ 0
+Text GLabel 1300 6850 0    50   Input ~ 0
 NRST
-NoConn ~ 3250 7150
+NoConn ~ 1550 6950
 Wire Wire Line
-	3000 6650 3250 6650
+	1300 6450 1550 6450
 Wire Wire Line
-	3250 6750 3000 6750
+	1550 6550 1300 6550
 Wire Wire Line
-	3000 6850 3250 6850
+	1300 6650 1550 6650
 Wire Wire Line
-	3250 6950 3000 6950
+	1550 6750 1300 6750
 Wire Wire Line
-	3000 7050 3250 7050
+	1300 6850 1550 6850
 $Comp
 L extsui:STM32L010F4P6 U1
 U 1 1 61C0D105
@@ -167,22 +167,20 @@ Text GLabel 3700 2150 0    50   Input ~ 0
 VDD
 Wire Wire Line
 	3700 2150 4500 2150
-Text GLabel 1800 3700 2    50   Input ~ 0
+Text GLabel 1850 4250 2    50   Input ~ 0
 SCL
-Text GLabel 1800 3800 2    50   Input ~ 0
+Text GLabel 1850 4350 2    50   Input ~ 0
 SDA
-Text GLabel 1800 4000 2    50   Input ~ 0
+Text GLabel 1850 4550 2    50   Input ~ 0
 GND
 Wire Wire Line
-	1800 3700 1200 3700
+	1850 4250 1550 4250
 Wire Wire Line
-	1200 3800 1800 3800
-Wire Wire Line
-	1800 4000 1500 4000
-Text GLabel 1800 3900 2    50   Input ~ 0
+	1850 4550 1350 4550
+Text GLabel 1850 4450 2    50   Input ~ 0
 VDD
 Wire Wire Line
-	1800 3900 1500 3900
+	1850 4450 1350 4450
 $Comp
 L Connector:Conn_01x10_Male TP1
 U 1 1 61C333AF
@@ -503,99 +501,97 @@ Power Flag
 Text Notes 800  3250 0    50   ~ 0
 Power Supply over I2C (3V3)
 Wire Notes Line
-	800  3300 800  5650
+	800  3300 800  5950
 Wire Notes Line
-	800  5650 2200 5650
+	800  5950 2200 5950
 Wire Notes Line
-	2200 5650 2200 3300
+	2200 5950 2200 3300
 Wire Notes Line
 	2200 3300 800  3300
 $Comp
 L power:GND #PWR0103
 U 1 1 61CAFD67
-P 1500 4100
-F 0 "#PWR0103" H 1500 3850 50  0001 C CNN
-F 1 "GND" H 1505 3927 50  0000 C CNN
-F 2 "" H 1500 4100 50  0001 C CNN
-F 3 "" H 1500 4100 50  0001 C CNN
-	1    1500 4100
+P 1350 4750
+F 0 "#PWR0103" H 1350 4500 50  0001 C CNN
+F 1 "GND" H 1355 4577 50  0000 C CNN
+F 2 "" H 1350 4750 50  0001 C CNN
+F 3 "" H 1350 4750 50  0001 C CNN
+	1    1350 4750
 	1    0    0    -1  
 $EndComp
-Connection ~ 1500 4000
+Connection ~ 1350 4550
 Wire Wire Line
-	1500 4000 1200 4000
+	1350 4550 1250 4550
 Wire Wire Line
-	1500 4100 1500 4000
+	1350 4750 1350 4550
 Wire Wire Line
-	1500 3900 1500 3600
-Wire Wire Line
-	1500 3900 1200 3900
-Connection ~ 1500 3900
+	1350 4450 1250 4450
+Connection ~ 1350 4450
 $Comp
 L power:+3.3V #PWR0104
 U 1 1 61CD28F0
-P 1500 3600
-F 0 "#PWR0104" H 1500 3450 50  0001 C CNN
-F 1 "+3.3V" H 1515 3773 50  0000 C CNN
-F 2 "" H 1500 3600 50  0001 C CNN
-F 3 "" H 1500 3600 50  0001 C CNN
-	1    1500 3600
+P 1350 3600
+F 0 "#PWR0104" H 1350 3450 50  0001 C CNN
+F 1 "+3.3V" H 1365 3773 50  0000 C CNN
+F 2 "" H 1350 3600 50  0001 C CNN
+F 3 "" H 1350 3600 50  0001 C CNN
+	1    1350 3600
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H1
 U 1 1 61CDE573
-P 1100 6150
-F 0 "H1" H 1200 6196 50  0000 L CNN
-F 1 "MountingHole" H 1200 6105 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 1100 6150 50  0001 C CNN
-F 3 "~" H 1100 6150 50  0001 C CNN
-	1    1100 6150
+P 2800 6450
+F 0 "H1" H 2900 6496 50  0000 L CNN
+F 1 "MountingHole" H 2900 6405 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2800 6450 50  0001 C CNN
+F 3 "~" H 2800 6450 50  0001 C CNN
+	1    2800 6450
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H2
 U 1 1 61CDE695
-P 1100 6450
-F 0 "H2" H 1200 6496 50  0000 L CNN
-F 1 "MountingHole" H 1200 6405 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 1100 6450 50  0001 C CNN
-F 3 "~" H 1100 6450 50  0001 C CNN
-	1    1100 6450
+P 2800 6750
+F 0 "H2" H 2900 6796 50  0000 L CNN
+F 1 "MountingHole" H 2900 6705 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2800 6750 50  0001 C CNN
+F 3 "~" H 2800 6750 50  0001 C CNN
+	1    2800 6750
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H3
 U 1 1 61CE0B41
-P 1100 6750
-F 0 "H3" H 1200 6796 50  0000 L CNN
-F 1 "MountingHole" H 1200 6705 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 1100 6750 50  0001 C CNN
-F 3 "~" H 1100 6750 50  0001 C CNN
-	1    1100 6750
+P 2800 7050
+F 0 "H3" H 2900 7096 50  0000 L CNN
+F 1 "MountingHole" H 2900 7005 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2800 7050 50  0001 C CNN
+F 3 "~" H 2800 7050 50  0001 C CNN
+	1    2800 7050
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H4
 U 1 1 61CE2FEA
-P 1100 7050
-F 0 "H4" H 1200 7096 50  0000 L CNN
-F 1 "MountingHole" H 1200 7005 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 1100 7050 50  0001 C CNN
-F 3 "~" H 1100 7050 50  0001 C CNN
-	1    1100 7050
+P 2800 7350
+F 0 "H4" H 2900 7396 50  0000 L CNN
+F 1 "MountingHole" H 2900 7305 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 2800 7350 50  0001 C CNN
+F 3 "~" H 2800 7350 50  0001 C CNN
+	1    2800 7350
 	1    0    0    -1  
 $EndComp
-Text Notes 800  5900 0    50   ~ 0
+Text Notes 2500 6200 0    50   ~ 0
 Spacers for board
 Wire Notes Line
-	2200 5950 800  5950
+	3900 6250 2500 6250
 Wire Notes Line
-	800  7350 2200 7350
+	2500 7550 3900 7550
 Wire Notes Line
-	800  5950 800  7350
+	2500 6250 2500 7550
 Wire Notes Line
-	2200 5950 2200 7350
+	3900 6250 3900 7550
 Text Notes 8550 2100 0    50   ~ 0
 Pull-up register\nis not prepared.
 Wire Notes Line
@@ -634,21 +630,21 @@ Connection ~ 3700 1750
 Wire Wire Line
 	3700 1750 3700 1650
 Wire Notes Line
-	3900 7350 2500 7350
+	2200 7150 800  7150
 Wire Notes Line
-	2500 7350 2500 6450
+	800  7150 800  6250
 Wire Notes Line
-	2500 6450 3900 6450
+	800  6250 2200 6250
 Wire Notes Line
-	3900 6450 3900 7350
+	2200 6250 2200 7150
 Wire Notes Line
 	11000 5950 11000 3300
 Wire Notes Line
-	11000 3300 8900 3300
+	11000 3300 8950 3300
 Wire Notes Line
-	8900 3300 8900 5950
+	8950 3300 8950 5950
 Wire Notes Line
-	8900 5950 11000 5950
+	8950 5950 11000 5950
 Wire Wire Line
 	10600 1250 10800 1250
 Wire Wire Line
@@ -4655,7 +4651,7 @@ Text Label 4500 2450 0    50   ~ 0
 USART2_TX
 Text Label 4500 2250 0    50   ~ 0
 USART2_RX
-Text Notes 2500 6400 0    50   ~ 0
+Text Notes 800  6200 0    50   ~ 0
 Debugger
 Wire Notes Line
 	8650 5950 2500 5950
@@ -4665,18 +4661,18 @@ Wire Notes Line
 	2500 3300 8650 3300
 Wire Notes Line
 	8650 3300 8650 5950
-Text Notes 8900 3250 0    50   ~ 0
+Text Notes 8950 3250 0    50   ~ 0
 UART
 Text Notes 2500 3250 0    50   ~ 0
 Rotary Encoders
 Wire Notes Line
 	2500 3000 2500 800 
 Wire Notes Line
-	2500 800  9350 800 
+	2500 800  9300 800 
 Wire Notes Line
-	9350 800  9350 3000
+	9300 800  9300 3000
 Wire Notes Line
-	9350 3000 2500 3000
+	9300 3000 2500 3000
 Text Notes 2500 750  0    50   ~ 0
 STM32L010F4P6
 Wire Notes Line
@@ -4705,8 +4701,8 @@ L Device:CP_Small C2
 U 1 1 61C6D6C3
 P 1500 2350
 F 0 "C2" H 1588 2396 50  0000 L CNN
-F 1 "47u" H 1588 2305 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 1500 2350 50  0001 C CNN
+F 1 "100u" H 1588 2305 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm" H 1500 2350 50  0001 C CNN
 F 3 "~" H 1500 2350 50  0001 C CNN
 	1    1500 2350
 	1    0    0    -1  
@@ -4796,31 +4792,81 @@ F 3 "~" H 10450 1650 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Connector:Conn_01x04_Male J1
+L Connector:Conn_01x04_Male CN2
 U 1 1 61D809D8
-P 1000 4900
-F 0 "J1" H 1100 5250 50  0000 C CNN
-F 1 "Conn_01x04_Male" H 1250 5150 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 1000 4900 50  0001 C CNN
-F 3 "~" H 1000 4900 50  0001 C CNN
-	1    1000 4900
+P 1050 5450
+F 0 "CN2" H 1150 5800 50  0000 C CNN
+F 1 "Conn_01x04_Male" H 1300 5700 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 1050 5450 50  0001 C CNN
+F 3 "~" H 1050 5450 50  0001 C CNN
+	1    1050 5450
 	1    0    0    -1  
 $EndComp
 Connection ~ 1100 2150
-Text GLabel 1800 5000 2    50   Input ~ 0
+Text GLabel 1850 5550 2    50   Input ~ 0
 SCL
-Text GLabel 1800 5100 2    50   Input ~ 0
+Text GLabel 1850 5650 2    50   Input ~ 0
 SDA
-Text GLabel 1800 4800 2    50   Input ~ 0
+Text GLabel 1850 5350 2    50   Input ~ 0
 GND
 Wire Wire Line
-	1800 4800 1200 4800
+	1850 5350 1250 5350
 Wire Wire Line
-	1200 4900 1800 4900
+	1250 5450 1850 5450
 Wire Wire Line
-	1800 5100 1200 5100
-Text GLabel 1800 4900 2    50   Input ~ 0
+	1850 5650 1250 5650
+Text GLabel 1850 5450 2    50   Input ~ 0
 VDD
 Wire Wire Line
-	1800 5000 1200 5000
+	1850 5550 1250 5550
+$Comp
+L Device:R R3
+U 1 1 61DA7390
+P 1550 4050
+F 0 "R3" V 1450 4050 50  0000 C CNN
+F 1 "N/A" V 1550 4050 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 1480 4050 50  0001 C CNN
+F 3 "~" H 1550 4050 50  0001 C CNN
+	1    1550 4050
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 61DA7397
+P 1750 4050
+F 0 "R4" V 1650 4050 50  0000 C CNN
+F 1 "N/A" V 1750 4050 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 1680 4050 50  0001 C CNN
+F 3 "~" H 1750 4050 50  0001 C CNN
+	1    1750 4050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1350 3650 1750 3650
+Wire Wire Line
+	1750 3650 1750 3900
+Connection ~ 1350 3650
+Wire Wire Line
+	1350 3650 1350 3600
+Connection ~ 1550 4250
+Wire Wire Line
+	1550 4250 1250 4250
+Wire Wire Line
+	1750 4200 1750 4350
+Wire Wire Line
+	1250 4350 1750 4350
+Connection ~ 1750 4350
+Wire Wire Line
+	1750 4350 1850 4350
+Wire Wire Line
+	1550 4200 1550 4250
+Wire Wire Line
+	1350 3850 1550 3850
+Wire Wire Line
+	1550 3850 1550 3900
+Connection ~ 1350 3850
+Wire Wire Line
+	1350 3850 1350 4450
+Wire Wire Line
+	1350 3650 1350 3850
 $EndSCHEMATC
