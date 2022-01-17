@@ -1,4 +1,16 @@
+/*
+ * Seeeduino XIAO を I2C マスタとした Valve の読み書きサンプル
+ */
 #include <Arduino.h>
+#include <Wire.h>
+#include "Valve.h"
+
+namespace {
+
+static TwoWire& g_Wire = Wire;
+static Valve g_Valve;
+
+}
 
 void setup()
 {
@@ -11,6 +23,9 @@ void setup()
 #define LOG(...) Serial.printf(__VA_ARGS__)
 
     LOG("setup done!\n");
+
+    g_Wire.begin();
+    g_Valve.Initialize(g_Wire);
 }
 
 void loop()
