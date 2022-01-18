@@ -1,8 +1,8 @@
 /*
  * Seeeduino XIAO を I2C マスタとした Valve の読み書きサンプル
  */
-#include <Arduino.h>
-#include <Wire.h>
+
+#include "Utils.h"
 #include "Valve.h"
 
 namespace {
@@ -19,13 +19,12 @@ void setup()
     // USB ポートが開くまで待機
     // USB-CDC 非搭載のものは常に true
     while(!Serial);
-
-#define LOG(...) Serial.printf(__VA_ARGS__)
-
     LOG("setup done!\n");
 
     g_Wire.begin();
-    g_Valve.Initialize(g_Wire);
+    int result = g_Valve.Initialize(g_Wire, Valve::I2cAddress);
+    // TORIAEZU: 実際の機器がまだないのでエラーになるはず
+    LOG("result = %d (expected: -1)\n", result);
 }
 
 void loop()

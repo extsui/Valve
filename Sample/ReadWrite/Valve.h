@@ -44,16 +44,24 @@ class Valve
 public:
     // Valve の I2C アドレス
     static constexpr uint8_t I2cAddress = 0x40; // TORIAEZU:
-
     // ロータリーエンコーダの個数
     static constexpr int RotaryEncoderCount = 4;
+
+private:
+    // ロータリーエンコーダの値が連続で格納されている開始レジスタアドレス
+    static constexpr uint8_t RegisterAddressRotaryEncoderBegin = 0x00;
+    // WHO_AM_I 値が格納されているレジスタアドレス
+    static constexpr uint8_t RegisterAddressWhoAmI = 0x80;
+    // WHO_AM_I 値
+    static constexpr uint8_t RegisterValueWhoAmI = 0xAA;
 
 public:
     Valve() noexcept;
     ~Valve() = default;
 
     // 初期化
-    void Initialize(TwoWire &wire) noexcept;
+    // Valve の疎通確認も行う
+    int Initialize(TwoWire &wire, uint8_t i2cAddress) noexcept;
 
     // ロータリエンコーダの前回からの差分値を取得
     // TORIAEZU: 前回からの差分値をそのまま返す
@@ -61,10 +69,12 @@ public:
     int ReadValue(int index) noexcept;
 
     // 現在のロータリエンコーダ値の更新
-    void Update() noexcept;
+    int Update() noexcept;
 
 private:
     RotaryEncoder m_Unit[RotaryEncoderCount];
     TwoWire *m_pWire;
+    bool m_IsInitialized;
+    uint8_t m_I2cAddress;
 };
 
