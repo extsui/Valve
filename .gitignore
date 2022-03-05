@@ -2,6 +2,8 @@
 **/.vscode/c_cpp_properties.json
 Build/
 
+!.vscode/c_cpp_properties.json
+
 # for MDK-ARM
 *.d
 *.o

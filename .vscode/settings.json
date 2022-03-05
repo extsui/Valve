@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "dma.h": "c",
+        "main.h": "c"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceRoot}/Program/Include/",
+                "${workspaceRoot}/Program/CubeMxGenerated/Core/Inc/",
+                "${workspaceRoot}/Program/CubeMxGenerated/Drivers/STM32L0xx_HAL_Driver/Inc/",
+                "${workspaceRoot}/Program/CubeMxGenerated/Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/",
+                "${workspaceRoot}/Program/CubeMxGenerated/Drivers/CMSIS/Device/ST/STM32L0xx/Include/",
+                "${workspaceRoot}/Program/CubeMxGenerated/Drivers/CMSIS/Include/",
+                "C:/Keil_v5/ARM/ARMCC/include/"
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32L010x4"
+            ]
+        }
+    ],
+    "version": 4
+}
