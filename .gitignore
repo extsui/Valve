@@ -1,3 +1,19 @@
 # for Arduino
 **/.vscode/c_cpp_properties.json
 Build/
+
+# for MDK-ARM
+*.d
+*.o
+*.iex
+*.crf
+*.scvd
+*.lst
+*.dep
+*.dbgconf
+*.uvguix.ext
+*.axf
+*.htm
+*.hex
+*.map
+*.lnp
