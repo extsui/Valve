@@ -83,10 +83,10 @@ void ValveMain()
            if (hasDifference) {
                 Console::Log("%d  % 3d  % 3d  % 3d  % 3d\n",
                     g_SamplingCount,
-                    g_RotaryEncoder[0].GetDifference(),
-                    g_RotaryEncoder[1].GetDifference(),
-                    g_RotaryEncoder[2].GetDifference(),
-                    g_RotaryEncoder[3].GetDifference()
+                    g_RotaryEncoder[0].GetTotalPosition(),
+                    g_RotaryEncoder[1].GetTotalPosition(),
+                    g_RotaryEncoder[2].GetTotalPosition(),
+                    g_RotaryEncoder[3].GetTotalPosition()
                 );
             }
 

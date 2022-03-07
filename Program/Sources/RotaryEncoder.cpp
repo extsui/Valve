@@ -4,6 +4,8 @@
 #include "Console.h"
 #endif
 
+#include "main.h"
+
 void RotaryEncoder::SetPortPin(PortPin *phaseA, PortPin *phaseB)
 {
     // TODO: assert(phaseA.Port == nullptr);
@@ -85,6 +87,9 @@ void RotaryEncoder::Sample()
             diff, diffSigned, currentValue, grayCode, m_previousValue);
     }
 #endif
+    if (diff != 0) {
+        HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+    }
 
     if ((diffSigned == 1) || (diffSigned == -1)) {
         m_difference += diffSigned;
