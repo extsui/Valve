@@ -1,0 +1,43 @@
+﻿<Window
+    x:Class="ValveDemo.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ValveDemo"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <Grid>
+        <Slider
+            Width="18"
+            Height="108"
+            Margin="307,172,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical" />
+        <Slider
+            Width="18"
+            Height="108"
+            Margin="351,172,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical" />
+        <Slider
+            Width="18"
+            Height="108"
+            Margin="400,172,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical" />
+        <Slider
+            Width="18"
+            Height="108"
+            Margin="448,172,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical" />
+
+    </Grid>
+</Window>
