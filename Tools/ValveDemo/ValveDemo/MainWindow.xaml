@@ -5,39 +5,44 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ValveDemo"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
-    Width="800"
-    Height="450"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    Name="root"
+    Title="ValveDemo"
+    Width="1000"
+    Height="500"
     mc:Ignorable="d">
     <Grid>
         <Slider
             Width="18"
             Height="108"
-            Margin="307,172,0,0"
+            Margin="48,68,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Orientation="Vertical" />
         <Slider
             Width="18"
             Height="108"
-            Margin="351,172,0,0"
+            Margin="92,68,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Orientation="Vertical" />
         <Slider
             Width="18"
             Height="108"
-            Margin="400,172,0,0"
+            Margin="141,68,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Orientation="Vertical" />
         <Slider
             Width="18"
             Height="108"
-            Margin="448,172,0,0"
+            Margin="189,68,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Orientation="Vertical" />
-
+        <oxy:PlotView
+            Margin="222,0,0,0"
+            Controller="{Binding Controller, ElementName=root}"
+            Model="{Binding Model, ElementName=root}" />
     </Grid>
 </Window>
