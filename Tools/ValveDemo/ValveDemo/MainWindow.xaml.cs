@@ -1,7 +1,9 @@
 ﻿using OxyPlot;
 using OxyPlot.Series;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO.Ports;
 using System.Windows;
 
 namespace ValveDemo
@@ -21,6 +23,8 @@ namespace ValveDemo
 
         // データを保存するコレクション
         public ObservableCollection<DataPoint> Datas { get; private set; } = new ObservableCollection<DataPoint>();
+
+        public SerialPort m_SerialPort { get; private set; }
 
         public MainWindow()
         {
@@ -53,16 +57,13 @@ namespace ValveDemo
             // データを関連付け
             LineSeries.ItemsSource = Datas;
             // 点を追加
-            List<DataPoint> points = new List<DataPoint>()
+            var rand = new Random();
+            List<DataPoint> points = new List<DataPoint>();
+            // 適当なサンプルデータを設定
+            for (int i = 0; i < 100; i++)
             {
-                // TORIAEZU: サンプルデータ。要削除
-                // (x, y)
-                new DataPoint(0, 0),
-                new DataPoint(1, 0.5),
-                new DataPoint(2, 0),
-                new DataPoint(3, -0.5),
-                new DataPoint(4, -1),
-            };
+                points.Add(new DataPoint(i, (rand.NextDouble() * 2 - 1) * 0.1));
+            }
             foreach (var point in points)
             {
                 Datas.Add(point);
