@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="ReactiveProperty" Version="8.0.4" />
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
   </ItemGroup>
 

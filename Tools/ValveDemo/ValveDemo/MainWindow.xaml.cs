@@ -3,7 +3,6 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO.Ports;
 using System.Windows;
 
 namespace ValveDemo
@@ -13,6 +12,8 @@ namespace ValveDemo
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ViewModel m_ViewModel = new ViewModel();
+
         // OxyPlotのためのモデルとコントローラー
         public PlotModel Model { get; } = new PlotModel();
         public PlotController Controller { get; } = new PlotController();
@@ -24,12 +25,12 @@ namespace ValveDemo
         // データを保存するコレクション
         public ObservableCollection<DataPoint> Datas { get; private set; } = new ObservableCollection<DataPoint>();
 
-        public SerialPort m_SerialPort { get; private set; }
-
         public MainWindow()
         {
             InitializeComponent();
             InitGraph();
+
+            DataContext = m_ViewModel;
         }
 
         // グラフの設定
@@ -74,6 +75,21 @@ namespace ValveDemo
 
             // セットした内容を反映させる
             Model.InvalidatePlot(true);
+        }
+
+        private void ComboBoxSerialPort_DropDownOpened(object sender, EventArgs e)
+        {
+            m_ViewModel.GetComPorts();
+        }
+
+        private void ButtonConnect_Click(object sender, RoutedEventArgs e)
+        {
+            m_ViewModel.SerialOpen();
+        }
+
+        private void ButtonDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            m_ViewModel.SerialClose();
         }
     }
 }

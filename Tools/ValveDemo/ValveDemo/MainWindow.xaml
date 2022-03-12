@@ -26,21 +26,29 @@
                     Width="120"
                     Margin="15"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Top" />
+                    VerticalAlignment="Top"
+                    DropDownOpened="ComboBoxSerialPort_DropDownOpened"
+                    ItemsSource="{Binding ComPorts}"
+                    SelectedItem="{Binding SelectedPort.Value}"
+                    SelectedValuePath="SerialPort" />
                 <Button
                     x:Name="ButtonConnect"
                     Width="75"
                     Margin="15"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="接続" />
+                    Click="ButtonConnect_Click"
+                    Content="接続"
+                    IsEnabled="{Binding ButtonConnect_IsEnabled.Value}" />
                 <Button
                     x:Name="ButtonDisconnect"
                     Width="75"
                     Margin="15"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="切断" />
+                    Click="ButtonDisconnect_Click"
+                    Content="切断"
+                    IsEnabled="{Binding ButtonDisconnect_IsEnabled.Value}" />
             </StackPanel>
 
             <StackPanel
@@ -125,7 +133,7 @@
                         AcceptsReturn="True"
                         Background="White"
                         DockPanel.Dock="Bottom"
-                        Text=""
+                        Text="{Binding TxData.Value}"
                         VerticalScrollBarVisibility="Visible" />
                 </DockPanel>
 
@@ -142,7 +150,7 @@
                         AcceptsReturn="True"
                         Background="White"
                         DockPanel.Dock="Bottom"
-                        Text=""
+                        Text="{Binding RxData.Value}"
                         VerticalScrollBarVisibility="Visible" />
                 </DockPanel>
             </StackPanel>
