@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ValveDemo
 {
@@ -90,6 +91,16 @@ namespace ValveDemo
         private void ButtonDisconnect_Click(object sender, RoutedEventArgs e)
         {
             m_ViewModel.SerialClose();
+        }
+
+        private void TextBoxTxData_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxTxData.ScrollToEnd();
+        }
+
+        private void TextBoxRxData_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxRxData.ScrollToEnd();
         }
     }
 }

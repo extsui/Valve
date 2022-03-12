@@ -127,6 +127,7 @@
                         Content="送信ログ"
                         DockPanel.Dock="Top" />
                     <TextBox
+                        x:Name="TextBoxTxData"
                         Width="400"
                         Height="auto"
                         Margin="10"
@@ -134,6 +135,7 @@
                         Background="White"
                         DockPanel.Dock="Bottom"
                         Text="{Binding TxData.Value}"
+                        TextChanged="TextBoxTxData_TextChanged"
                         VerticalScrollBarVisibility="Visible" />
                 </DockPanel>
 
@@ -144,6 +146,7 @@
                         Content="受信ログ"
                         DockPanel.Dock="Top" />
                     <TextBox
+                        x:Name="TextBoxRxData"
                         Width="400"
                         Height="auto"
                         Margin="10"
@@ -151,6 +154,7 @@
                         Background="White"
                         DockPanel.Dock="Bottom"
                         Text="{Binding RxData.Value}"
+                        TextChanged="TextBoxRxData_TextChanged"
                         VerticalScrollBarVisibility="Visible" />
                 </DockPanel>
             </StackPanel>
