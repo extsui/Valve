@@ -35,8 +35,7 @@ namespace ValveDemo.Models
 
             foreach (var str in encoderStrings)
             {
-                int encoder = 0;
-                var result = int.TryParse(str, out encoder);
+                var result = int.TryParse(str, out encoderValue[count]);
                 if (!result)
                 {
                     return false;

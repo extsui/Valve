@@ -18,6 +18,11 @@ namespace ValveDemo
         public ReactiveProperty<bool> ButtonConnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(true);
         public ReactiveProperty<bool> ButtonDisconnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(false);
 
+        public ReactiveProperty<double> EncoderValue1 { get; set; } = new ReactiveProperty<double>(0);
+        public ReactiveProperty<double> EncoderValue2 { get; set; } = new ReactiveProperty<double>(0);
+        public ReactiveProperty<double> EncoderValue3 { get; set; } = new ReactiveProperty<double>(0);
+        public ReactiveProperty<double> EncoderValue4 { get; set; } = new ReactiveProperty<double>(0);
+
         private SerialPortManager m_SerialPortManager;
         private Valve m_Valve;
 
@@ -25,6 +30,8 @@ namespace ValveDemo
         {
             m_SerialPortManager = new SerialPortManager();
             m_Valve = new Valve();
+
+            WriteLine("Valve Initialize.");
         }
 
         public void GetComPorts()
@@ -76,6 +83,11 @@ namespace ValveDemo
             {
                 WriteLine($"[warn] valve string error! (\"{value}\")");
             }
+
+            EncoderValue1.Value = (double)m_Valve.EncoderValue[0];
+            EncoderValue2.Value = (double)m_Valve.EncoderValue[1];
+            EncoderValue3.Value = (double)m_Valve.EncoderValue[2];
+            EncoderValue4.Value = (double)m_Valve.EncoderValue[3];
         }
 
         public void WriteLine(string value)
