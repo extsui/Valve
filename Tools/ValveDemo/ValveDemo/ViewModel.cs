@@ -19,10 +19,12 @@ namespace ValveDemo
         public ReactiveProperty<bool> ButtonDisconnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(false);
 
         private SerialPortManager m_SerialPortManager;
+        private Valve m_Valve;
 
         public ViewModel()
         {
             m_SerialPortManager = new SerialPortManager();
+            m_Valve = new Valve();
         }
 
         public void GetComPorts()
@@ -66,7 +68,14 @@ namespace ValveDemo
 
         private void OnReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            RxData.Value += m_SerialPortManager.Read();
+            string value = m_SerialPortManager.Read();
+            RxData.Value += value + "\r\n";
+
+            var result = m_Valve.Update(value);
+            if (!result)
+            {
+                WriteLine($"[warn] valve string error! (\"{value}\")");
+            }
         }
 
         public void WriteLine(string value)

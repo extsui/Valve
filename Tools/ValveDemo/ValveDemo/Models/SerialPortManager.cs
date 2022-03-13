@@ -33,7 +33,7 @@ namespace ValveDemo.Models
 
         public string Read()
         {
-            return m_SerialPort.ReadExisting();
+            return m_SerialPort.ReadLine();
         }
 
         public void SetReceivedHandler(SerialDataReceivedEventHandler handler)
