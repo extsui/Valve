@@ -29,8 +29,7 @@
                     VerticalAlignment="Top"
                     DropDownOpened="ComboBoxSerialPort_DropDownOpened"
                     ItemsSource="{Binding ComPorts}"
-                    SelectedItem="{Binding SelectedPort.Value}"
-                    SelectedValuePath="SerialPort" />
+                    SelectedItem="{Binding SelectedPort.Value}" />
                 <Button
                     x:Name="ButtonConnect"
                     Width="75"
@@ -124,25 +123,6 @@
                     <Label
                         Margin="5,5,0,0"
                         Background="White"
-                        Content="送信ログ"
-                        DockPanel.Dock="Top" />
-                    <TextBox
-                        x:Name="TextBoxTxData"
-                        Width="400"
-                        Height="auto"
-                        Margin="10"
-                        AcceptsReturn="True"
-                        Background="White"
-                        DockPanel.Dock="Bottom"
-                        Text="{Binding TxData.Value}"
-                        TextChanged="TextBoxTxData_TextChanged"
-                        VerticalScrollBarVisibility="Visible" />
-                </DockPanel>
-
-                <DockPanel Background="White">
-                    <Label
-                        Margin="5,5,0,0"
-                        Background="White"
                         Content="受信ログ"
                         DockPanel.Dock="Top" />
                     <TextBox
@@ -155,6 +135,25 @@
                         DockPanel.Dock="Bottom"
                         Text="{Binding RxData.Value}"
                         TextChanged="TextBoxRxData_TextChanged"
+                        VerticalScrollBarVisibility="Visible" />
+                </DockPanel>
+
+                <DockPanel Background="White">
+                    <Label
+                        Margin="5,5,0,0"
+                        Background="White"
+                        Content="デバッグログ"
+                        DockPanel.Dock="Top" />
+                    <TextBox
+                        x:Name="TextBoxLog"
+                        Width="400"
+                        Height="auto"
+                        Margin="10"
+                        AcceptsReturn="True"
+                        Background="White"
+                        DockPanel.Dock="Bottom"
+                        Text="{Binding LogData.Value}"
+                        TextChanged="TextBoxLog_TextChanged"
                         VerticalScrollBarVisibility="Visible" />
                 </DockPanel>
             </StackPanel>

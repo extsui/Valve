@@ -13,8 +13,8 @@ namespace ValveDemo
 
         public ReactiveCollection<string> ComPorts { get; set; } = new ReactiveCollection<string>();
         public ReactiveProperty<string> SelectedPort { get; set; } = new ReactiveProperty<string>();
-        public ReactiveProperty<string> TxData { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> RxData { get; set; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> LogData { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ButtonConnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(true);
         public ReactiveProperty<bool> ButtonDisconnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(false);
 
@@ -67,6 +67,11 @@ namespace ValveDemo
         private void OnReceived(object sender, SerialDataReceivedEventArgs e)
         {
             RxData.Value += m_SerialPortManager.Read();
+        }
+
+        public void WriteLine(string value)
+        {
+            LogData.Value += value + "\r\n";
         }
     }
 }

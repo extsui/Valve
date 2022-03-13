@@ -93,14 +93,14 @@ namespace ValveDemo
             m_ViewModel.SerialClose();
         }
 
-        private void TextBoxTxData_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBoxTxData.ScrollToEnd();
-        }
-
         private void TextBoxRxData_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBoxRxData.ScrollToEnd();
+        }
+
+        private void TextBoxLog_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxLog.ScrollToEnd();
         }
     }
 }
