@@ -9,7 +9,7 @@
     Name="root"
     Title="ValveDemo"
     Width="860"
-    Height="610"
+    Height="630"
     mc:Ignorable="d">
 
     <Grid>
@@ -71,6 +71,7 @@
                             Minimum="-96"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue1.Value}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue1.Value}" />
                         <CheckBox
                             Margin="0,10,0,0"
                             HorizontalAlignment="Center"
@@ -89,6 +90,7 @@
                             Minimum="-96"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue2.Value}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue2.Value}" />
                         <CheckBox
                             Margin="0,10,0,0"
                             HorizontalAlignment="Center"
@@ -107,6 +109,7 @@
                             Minimum="-96"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue3.Value}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue3.Value}" />
                         <CheckBox
                             Margin="0,10,0,0"
                             HorizontalAlignment="Center"
@@ -125,6 +128,7 @@
                             Minimum="-96"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue4.Value}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue4.Value}" />
                         <CheckBox
                             Margin="0,10,0,0"
                             HorizontalAlignment="Center"
