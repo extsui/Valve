@@ -1,5 +1,6 @@
 ﻿using Reactive.Bindings;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace ValveDemo
 
         public ReactiveCollection<string> ComPorts { get; set; } = new ReactiveCollection<string>();
         public ReactiveProperty<string> SelectedPort { get; set; } = new ReactiveProperty<string>();
-        public ReactiveProperty<string> RxData { get; set; } = new ReactiveProperty<string>();
+        public ReactiveCollection<string> RxData { get; set; } = new ReactiveCollection<string>();
         public ReactiveProperty<string> LogData { get; set; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> ButtonConnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(true);
         public ReactiveProperty<bool> ButtonDisconnect_IsEnabled { get; set; } = new ReactiveProperty<bool>(false);
@@ -76,7 +77,9 @@ namespace ValveDemo
         private void OnReceived(object sender, SerialDataReceivedEventArgs e)
         {
             string value = m_SerialPortManager.Read();
-            RxData.Value += value + "\r\n";
+
+            // UI スレッド以外からの操作のため Add() では NG
+            RxData.AddOnScheduler(value);
 
             var result = m_Valve.Update(value);
             if (!result)

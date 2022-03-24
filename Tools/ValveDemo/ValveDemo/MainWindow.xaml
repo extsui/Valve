@@ -157,17 +157,20 @@
                         Background="White"
                         Content="受信ログ"
                         DockPanel.Dock="Top" />
-                    <TextBox
-                        x:Name="TextBoxRxData"
+                    <ListBox
+                        x:Name="ListBoxRxData"
                         Width="400"
                         Height="auto"
                         Margin="10"
-                        AcceptsReturn="True"
                         Background="White"
                         DockPanel.Dock="Bottom"
-                        Text="{Binding RxData.Value}"
-                        TextChanged="TextBoxRxData_TextChanged"
-                        VerticalScrollBarVisibility="Visible" />
+                        ItemsSource="{Binding RxData}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </DockPanel>
 
                 <DockPanel Background="White">
