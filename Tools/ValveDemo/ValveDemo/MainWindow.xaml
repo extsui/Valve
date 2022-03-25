@@ -134,15 +134,19 @@
                             HorizontalAlignment="Center"
                             IsChecked="True" />
                     </StackPanel>
-
                 </StackPanel>
+
                 <oxy:PlotView
                     Width="640"
                     Height="auto"
                     Margin="10"
                     Background="White"
-                    Controller="{Binding Controller, ElementName=root}"
-                    Model="{Binding Model, ElementName=root}" />
+                    Controller="{Binding Controller}"
+                    Model="{Binding Model}"
+                    PanCursor="Hand"
+                    ZoomHorizontalCursor="SizeWE"
+                    ZoomRectangleCursor="SizeNWSE"
+                    ZoomVerticalCursor="SizeNS" />
             </StackPanel>
 
             <StackPanel

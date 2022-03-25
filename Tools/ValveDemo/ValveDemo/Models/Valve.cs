@@ -17,7 +17,7 @@ namespace ValveDemo.Models
 
         public Valve(Valve valve)
         {
-            EncoderValue = valve.EncoderValue;
+            EncoderValue = (int[])valve.EncoderValue.Clone();
         }
 
         /// <summary>
