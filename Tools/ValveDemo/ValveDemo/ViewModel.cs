@@ -26,11 +26,13 @@ namespace ValveDemo
 
         private SerialPortManager m_SerialPortManager;
         private Valve m_Valve;
+        private ValveQueue m_ValveQueue;
 
         public ViewModel()
         {
             m_SerialPortManager = new SerialPortManager();
             m_Valve = new Valve();
+            m_ValveQueue = new ValveQueue();
 
             WriteLine("Valve Initialize.");
         }
@@ -87,10 +89,16 @@ namespace ValveDemo
                 WriteLine($"[warn] valve string error! (\"{value}\")");
             }
 
+            m_ValveQueue.Enqueue(new Valve(m_Valve));
+
+            // UI の更新
             EncoderValue1.Value = (double)m_Valve.EncoderValue[0];
             EncoderValue2.Value = (double)m_Valve.EncoderValue[1];
             EncoderValue3.Value = (double)m_Valve.EncoderValue[2];
             EncoderValue4.Value = (double)m_Valve.EncoderValue[3];
+
+            // TODO:
+            //m_ValveQueue.ReadAll();
         }
 
         public void WriteLine(string value)

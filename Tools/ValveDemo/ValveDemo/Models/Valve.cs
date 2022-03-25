@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace ValveDemo.Models
 {
@@ -12,6 +13,11 @@ namespace ValveDemo.Models
         public Valve()
         {
             EncoderValue = new int[EncoderCount];
+        }
+
+        public Valve(Valve valve)
+        {
+            EncoderValue = valve.EncoderValue;
         }
 
         /// <summary>
@@ -51,6 +57,32 @@ namespace ValveDemo.Models
             }
 
             return true;
+        }
+    }
+
+    internal class ValveQueue
+    {
+        public const int CountMax = 100;
+
+        private Queue<Valve> m_Datas;
+
+        public ValveQueue()
+        {
+            m_Datas = new Queue<Valve>();
+        }
+
+        public void Enqueue(Valve valve)
+        {
+            m_Datas.Enqueue(valve);
+            if (m_Datas.Count > CountMax)
+            {
+                m_Datas.Dequeue();
+            }
+        }
+
+        public Queue<Valve> ReadAll()
+        {
+            return m_Datas;
         }
     }
 }
