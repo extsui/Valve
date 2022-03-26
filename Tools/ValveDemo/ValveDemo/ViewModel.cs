@@ -48,8 +48,6 @@ namespace ValveDemo
 
             // X軸の設定
             axisX.Position = OxyPlot.Axes.AxisPosition.Bottom;    // 軸の位置(topにしたら、目盛りが上にくる)
-            axisX.Minimum = 0;
-            axisX.Maximum = 100;
 
             // Y軸の設定
             axisY.Position = OxyPlot.Axes.AxisPosition.Left;      // Y軸の位置(Rightにしたら、目盛りが右にくる)
@@ -176,13 +174,17 @@ namespace ValveDemo
                 var points2 = new List<DataPoint>();
                 var points3 = new List<DataPoint>();
                 var points4 = new List<DataPoint>();
-                for (int i = 0; i < queue.Length; i++)
+
+                // タイムスタンプ (ms) を元に秒単位の時間軸にする
+                foreach (var item in queue)
                 {
-                    points1.Add(new DataPoint(i, queue[i].EncoderValue[0]));
-                    points2.Add(new DataPoint(i, queue[i].EncoderValue[1]));
-                    points3.Add(new DataPoint(i, queue[i].EncoderValue[2]));
-                    points4.Add(new DataPoint(i, queue[i].EncoderValue[3]));
+                    var x = (double)item.TimeStamp / 1000;
+                    points1.Add(new DataPoint(x, item.EncoderValue[0]));
+                    points2.Add(new DataPoint(x, item.EncoderValue[1]));
+                    points3.Add(new DataPoint(x, item.EncoderValue[2]));
+                    points4.Add(new DataPoint(x, item.EncoderValue[3]));
                 }
+
                 points1.ForEach(point => EncoderDatas1.Add(point));
                 points2.ForEach(point => EncoderDatas2.Add(point));
                 points3.ForEach(point => EncoderDatas3.Add(point));

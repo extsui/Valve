@@ -8,15 +8,18 @@ namespace ValveDemo.Models
     internal class Valve
     {
         public const int EncoderCount = 4;
+        public int TimeStamp;
         public int[] EncoderValue { get; private set; }
 
         public Valve()
         {
+            TimeStamp = 0;
             EncoderValue = new int[EncoderCount];
         }
 
         public Valve(Valve valve)
         {
+            TimeStamp = valve.TimeStamp;
             EncoderValue = (int[])valve.EncoderValue.Clone();
         }
 
@@ -29,8 +32,10 @@ namespace ValveDemo.Models
             var regex = new Regex(" +");
             string[] elements = regex.Replace(value, ",").Split(',');
 
-            var encoderStrings = elements.Skip(1);
+            var timeStanpString = elements[0];
+            int.TryParse(timeStanpString, out TimeStamp);
 
+            var encoderStrings = elements.Skip(1);
             if (encoderStrings.Count() != Valve.EncoderCount)
             {
                 return false;
