@@ -67,8 +67,9 @@
                             Height="120"
                             Margin="10"
                             VerticalAlignment="Top"
-                            Maximum="96"
-                            Minimum="-96"
+                            IsEnabled="False"
+                            Maximum="127"
+                            Minimum="-128"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue1.Value}" />
                         <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue1.Value}" />
@@ -86,8 +87,9 @@
                             Height="120"
                             Margin="10"
                             VerticalAlignment="Top"
-                            Maximum="96"
-                            Minimum="-96"
+                            IsEnabled="False"
+                            Maximum="127"
+                            Minimum="-128"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue2.Value}" />
                         <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue2.Value}" />
@@ -105,8 +107,9 @@
                             Height="120"
                             Margin="10"
                             VerticalAlignment="Top"
-                            Maximum="96"
-                            Minimum="-96"
+                            IsEnabled="False"
+                            Maximum="127"
+                            Minimum="-128"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue3.Value}" />
                         <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue3.Value}" />
@@ -124,8 +127,9 @@
                             Height="120"
                             Margin="10"
                             VerticalAlignment="Top"
-                            Maximum="96"
-                            Minimum="-96"
+                            IsEnabled="False"
+                            Maximum="127"
+                            Minimum="-128"
                             Orientation="Vertical"
                             Value="{Binding EncoderValue4.Value}" />
                         <TextBlock HorizontalAlignment="Center" Text="{Binding EncoderValue4.Value}" />
