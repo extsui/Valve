@@ -6,7 +6,6 @@
 #include "stm32l0xx_hal_tim.h"
 
 extern UART_HandleTypeDef huart2;
-
 extern TIM_HandleTypeDef htim2;
 
 namespace {
@@ -72,30 +71,13 @@ void ValveMain()
 
     while (1) {
         if (g_SamplingCount % 50 == 0) {
-            int8_t difference[RotaryEncoderCount] = {
-                static_cast<int8_t>(g_RotaryEncoder[0].GetDifference()),
-                static_cast<int8_t>(g_RotaryEncoder[1].GetDifference()),
-                static_cast<int8_t>(g_RotaryEncoder[2].GetDifference()),
-                static_cast<int8_t>(g_RotaryEncoder[3].GetDifference()),
-            };
-
-            bool hasDifference = (difference[0] != 0 || difference[1] != 0 || difference[2] != 0 || difference[3] != 0);
-           if (hasDifference) {
-                Console::Log("%d  % 3d  % 3d  % 3d  % 3d\n",
-                    g_SamplingCount,
-                    g_RotaryEncoder[0].GetTotalPosition(),
-                    g_RotaryEncoder[1].GetTotalPosition(),
-                    g_RotaryEncoder[2].GetTotalPosition(),
-                    g_RotaryEncoder[3].GetTotalPosition()
-                );
-            }
-
-            // Sample() と Commit() は要排他
-            HAL_NVIC_DisableIRQ(TIM2_IRQn);
-            for (auto& rotaryEncoder : g_RotaryEncoder) {
-                rotaryEncoder.Commit();
-            }
-            HAL_NVIC_EnableIRQ(TIM2_IRQn);
+            Console::Log("%d  % 3d  % 3d  % 3d  % 3d\n",
+                g_SamplingCount,
+                g_RotaryEncoder[0].GetPosition(),
+                g_RotaryEncoder[1].GetPosition(),
+                g_RotaryEncoder[2].GetPosition(),
+                g_RotaryEncoder[3].GetPosition()
+            );
         }
     }
 }

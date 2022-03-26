@@ -23,11 +23,9 @@ public:
     RotaryEncoder()
      : m_phaseA(nullptr, 0)
      , m_phaseB(nullptr, 0)
-     , m_totalPosition(0)
-     , m_totalErrorCount(0)
-     , m_difference(0)
-     , m_isUpdated(false)
+     , m_position(0)
      , m_previousValue(0xFF)
+     , m_errorCount(0)
     {
     }
 
@@ -41,14 +39,8 @@ public:
     // ポーリング方式なのでノイズ除去が適切に働く周期で呼び出すこと
     void Sample();
 
-    // 今回の差分をコミットする
-    // 呼び出し側で値取得の一区切りのタイミングで呼び出すこと
-    void Commit();
-
-    int GetTotalPosition();
-    int GetTotalErrorCount();
-    int GetDifference();
-    bool IsUpdated();
+    int GetPosition();
+    int GetErrorCount();
 
 private:
     // A 相
@@ -57,17 +49,13 @@ private:
     PortPin m_phaseB;
 
     // 起動時からの積算位置
-    int m_totalPosition;
-    // 起動時からの積算エラー回数
-    int m_totalErrorCount;
-
-    // 前回からの差分
-    int m_difference;
-    // 前回から更新があったか
-    bool m_isUpdated;
+    int8_t m_position;
 
     // 前回の値 (内部計算用)
     uint8_t m_previousValue;
+
+    // 起動時からの積算エラー回数 (デバッグ用)
+    uint32_t m_errorCount;
 };
 
 #endif // ROTARY_ENCODER_H

@@ -92,42 +92,24 @@ void RotaryEncoder::Sample()
     }
 
     if ((diffSigned == 1) || (diffSigned == -1)) {
-        m_difference += diffSigned;
-        m_isUpdated = true;
+        m_position += diffSigned;
     } else if (diffSigned == 0) {
         // 静止
     } else {
         // エラー
         // サンプリング周期より早く回した場合やチャタリング除去に失敗した場合に発生
-        m_totalErrorCount++;
+        m_errorCount++;
     }
 
     m_previousValue = currentValue;
 }
 
-void RotaryEncoder::Commit()
+int RotaryEncoder::GetPosition()
 {
-    m_totalPosition += m_difference;
-    m_difference = 0;
-    m_isUpdated = false;
+    return m_position;
 }
 
-int RotaryEncoder::GetTotalPosition()
+int RotaryEncoder::GetErrorCount()
 {
-    return m_totalPosition;
-}
-
-int RotaryEncoder::GetTotalErrorCount()
-{
-    return m_totalErrorCount;
-}
-
-int RotaryEncoder::GetDifference()
-{
-    return m_difference;
-}
-
-bool RotaryEncoder::IsUpdated()
-{
-    return m_isUpdated;
+    return m_errorCount;
 }
