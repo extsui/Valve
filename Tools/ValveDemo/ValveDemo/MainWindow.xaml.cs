@@ -1,8 +1,5 @@
-﻿using OxyPlot;
-using OxyPlot.Series;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -40,6 +37,17 @@ namespace ValveDemo
         private void TextBoxLog_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBoxLog.ScrollToEnd();
+        }
+
+        // リストボックスの自動スクロール処理
+        private void ListBoxRxData_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+            Action<object, NotifyCollectionChangedEventArgs> collectionChanged = (sender, e) =>
+            {
+                ListBoxRxData.ScrollIntoView(ListBoxRxData.Items[ListBoxRxData.Items.Count - 1]);
+            };
+
+            (ListBoxRxData.ItemsSource as INotifyCollectionChanged).CollectionChanged += new NotifyCollectionChangedEventHandler(collectionChanged);
         }
     }
 }

@@ -178,6 +178,7 @@
                         Background="White"
                         Content="受信ログ"
                         DockPanel.Dock="Top" />
+                    <!--  要素追加時に末尾までスクロールさせる用に UpdateSourceTrigger, NotifyOnTargetUpdated を設定  -->
                     <ListBox
                         x:Name="ListBoxRxData"
                         Width="400"
@@ -185,7 +186,8 @@
                         Margin="10"
                         Background="White"
                         DockPanel.Dock="Bottom"
-                        ItemsSource="{Binding RxData}">
+                        ItemsSource="{Binding RxData, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}"
+                        TargetUpdated="ListBoxRxData_TargetUpdated">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
