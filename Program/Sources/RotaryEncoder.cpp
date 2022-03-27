@@ -17,6 +17,11 @@ void RotaryEncoder::SetPortPin(PortPin *phaseA, PortPin *phaseB)
     m_phaseB.Pin  = phaseB->Pin;
 }
 
+void RotaryEncoder::SetReverse()
+{
+    m_IsReversed = true;
+}
+
 void RotaryEncoder::Sample()
 {
     // < 変換アルゴリズム >
@@ -92,7 +97,7 @@ void RotaryEncoder::Sample()
     }
 
     if ((diffSigned == 1) || (diffSigned == -1)) {
-        m_position += diffSigned;
+        m_position += (!m_IsReversed ? diffSigned : - diffSigned);
     } else if (diffSigned == 0) {
         // 静止
     } else {

@@ -23,6 +23,7 @@ public:
     RotaryEncoder()
      : m_phaseA(nullptr, 0)
      , m_phaseB(nullptr, 0)
+     , m_IsReversed(false)
      , m_position(0)
      , m_previousValue(0xFF)
      , m_errorCount(0)
@@ -34,6 +35,8 @@ public:
     }
 
     void SetPortPin(PortPin *phaseA, PortPin *phaseB);
+
+    void SetReverse();
 
     // A/B 相のサンプリング
     // ポーリング方式なのでノイズ除去が適切に働く周期で呼び出すこと
@@ -47,6 +50,10 @@ private:
     PortPin m_phaseA;
     // B 相
     PortPin m_phaseB;
+
+    // 回転方向の反転フラグ
+    // (エンコーダの取付方向によっては逆になるため)
+    bool m_IsReversed;
 
     // 起動時からの積算位置
     int8_t m_position;

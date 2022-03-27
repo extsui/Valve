@@ -64,6 +64,10 @@ void ValveMain()
     for (int i = 0; i < RotaryEncoderCount; i++) {
         auto setting = &RotaryEncoderPortPinSettings[i];
         g_RotaryEncoder[i].SetPortPin(&setting->PhaseA, &setting->PhaseB);
+
+        // 今回作成した評価基板ではエンコーダ向きが逆のため
+        g_RotaryEncoder[i].SetReverse();
+
         g_RotaryEncoder[i].Sample();
     }
 
