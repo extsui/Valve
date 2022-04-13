@@ -74,40 +74,39 @@ volatile int g_TxBufferCount = 0;
 volatile uint8_t g_RxBuffer[8];
 volatile uint8_t g_TxBuffer[8];
 
+// 送信準備出来たか
+volatile bool g_IsReadyTx = false;
+
+// I2C トランザクションが完了した場合に ON
+volatile bool g_TransactionCompleted = false;
+
 // アドレス一致時点で呼び出される
 extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
 {
     UNUSED(AddrMatchCode);
 
-    if (hi2c->Instance == I2C1) {
-        if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
-            // (1) 受信開始のタイミング
-            //Console::Log("(1)\n");
-            LED_DEBUG(1);
+    // 対象チャンネルでない場合は終了
+    if (hi2c->Instance != I2C1) {
+        return;
+    }
 
-            g_RxBufferCount = 0;
-            std::memset(const_cast<uint8_t*>(g_RxBuffer), 0, sizeof(g_RxBuffer));
-            // 何 byte 受信するか不明のため 1 byte ずつ割り込みを発生させる (応答は ACK 固定)
-            HAL_I2C_Slave_Seq_Receive_IT(hi2c, (uint8_t*)g_RxBuffer, 1, I2C_NEXT_FRAME);
-        } else {
-            // (3) 送信開始のタイミング
-            // この時点で受信バッファは確定する
-            //Console::Log("(3)\n");
-            LED_DEBUG(3);
+    if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
+        // (1) 受信開始のタイミング (Master --> Slave)
+        LED_DEBUG(1);
 
-            //Console::Log("R=%d [ ", g_RxBufferCount);
-            //for (int i = 0; i < g_RxBufferCount; i++) {
-            //    Console::Log("0x%02x ", g_RxBuffer[i]);
-            //}
-            //Console::Log("]\n");
+        g_RxBufferCount = 0;
+        std::memset(const_cast<uint8_t*>(g_RxBuffer), 0, sizeof(g_RxBuffer));
+        // 何 byte 受信するか不明のため 1 byte ずつ割り込みを発生させる (応答は ACK 固定)
+        HAL_I2C_Slave_Seq_Receive_IT(hi2c, (uint8_t*)g_RxBuffer, 1, I2C_NEXT_FRAME);
 
-            g_TxBufferCount = 0;
-            g_TxBuffer[0] = 0x11;
-            g_TxBuffer[1] = 0x22;
-            g_TxBuffer[2] = 0x33;
-            g_TxBuffer[3] = 0x44;
-            HAL_I2C_Slave_Seq_Transmit_IT(hi2c, (uint8_t*)g_TxBuffer, 1, I2C_NEXT_FRAME);
-        }
+    } else {
+        // (3) 送信開始のタイミング (Master <-- Slave)
+        // この時点で受信バッファは確定する
+        LED_DEBUG(3);
+
+        // 送信開始はメインコンテキストから行う
+        // それまではクロックストレッチが効くハズ (要確認)
+        g_IsReadyTx = true;
     }
 }
 
@@ -115,7 +114,6 @@ extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDi
 extern "C" void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)      
 {
     // (2) 1byte 受信完了タイミング
-    //Console::Log("(2)\n");
     LED_DEBUG(2);
 
     // バッファオーバーラン対策
@@ -131,7 +129,6 @@ extern "C" void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 extern "C" void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     // (4) 1byte 送信完了タイミング
-    //Console::Log("(4)\n");
     LED_DEBUG(4);
 
     g_TxBufferCount++;
@@ -174,7 +171,6 @@ extern "C" void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 
 extern "C" void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    //Console::Log("(L)\n");
     LED_DEBUG(6);
 
     // マスタからの受信のみの場合は受信継続中になっているので一旦受信を止める必要がある
@@ -182,15 +178,10 @@ extern "C" void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
     if (state != HAL_I2C_STATE_READY) {
         // ここに来ない... (1)->(2)->(2)->(L)->(4) の順で来て、以降の I2C が出来なくなる
         HAL_I2C_Init(hi2c);
+        Console::Log("I2C トランザクション異常終了\n");
     }
 
-/*
-    Console::Log("R=%d [ ", g_RxBufferCount);
-    for (int i = 0; i < g_RxBufferCount; i++) {
-        Console::Log("0x%02x ", g_RxBuffer[i]);
-    }
-    Console::Log("]\n");
-*/
+    g_TransactionCompleted = true;
 
     // I2C 通信で割り込み禁止に落とされているので
     // 通信完了時に割り込み許可に戻す必要がある
@@ -217,6 +208,38 @@ void ValveMain()
     HAL_TIM_Base_Start_IT(&htim2);
 
     while (1) {
+
+        // I2C 送信 (Master <-- Slave)
+        if (g_IsReadyTx) {
+            g_IsReadyTx = false;
+            
+            // 受信データがあったら解析
+            if (g_RxBufferCount == 0) {
+                Console::Log("受信データ無しで送信要求は異常\n");
+                continue;
+            }
+
+            // TODO: 受信のみの場合の解析と処理を合わせたい
+            // TORIAEZU: 受信後送信のケースのみ実装しておく
+            g_TxBufferCount = 0;
+            g_TxBuffer[0] = 0x11;
+            g_TxBuffer[1] = 0x22;
+            g_TxBuffer[2] = 0x33;
+            g_TxBuffer[3] = 0x44;
+            HAL_I2C_Slave_Seq_Transmit_IT(&hi2c1, (uint8_t*)g_TxBuffer, 1, I2C_NEXT_FRAME);
+        }
+
+        // I2C トランザクション 1 回が完了した後のサマリー表示
+        if (g_TransactionCompleted) {
+            g_TransactionCompleted = false;
+
+            Console::Log("R=%d [ ", g_RxBufferCount);
+            for (int i = 0; i < g_RxBufferCount; i++) {
+                Console::Log("0x%02x ", g_RxBuffer[i]);
+            }
+            Console::Log("]\n");
+        }
+
         if (g_SamplingCount % 50 == 0) {
             Console::Log("%d  % 3d  % 3d  % 3d  % 3d\n",
                 g_SamplingCount,
