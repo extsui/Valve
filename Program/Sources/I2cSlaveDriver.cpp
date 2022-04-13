@@ -1,3 +1,5 @@
+#if 0
+
 #include "I2cSlaveDriver.h"
 
 //#ifdef I2C_SLAVE_DRIVER_DEBUG
@@ -174,3 +176,5 @@ extern "C" void I2C1_IRQHandler(void)
 {
     m_Impl.EventHandler();
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if 0
+
 #ifndef I2C_SLAVE_DRIVER_H
 #define I2C_SLAVE_DRIVER_H
 
@@ -37,3 +39,5 @@ private:
 };
 
 #endif // I2C_SLAVE_DRIVER_H
+
+#endif
