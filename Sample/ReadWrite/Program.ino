@@ -140,21 +140,63 @@ void I2cTest()
     LOG("Done.\n");
 }
 
-// 2byte write --> 2byte read
-void debugI2c()
+void TestValve()
 {
-    uint8_t rxData[2] = { 0xFF, 0xFF };
+    constexpr int TransactionIntervalMilliSeconds = 1000;
 
-    g_Wire.beginTransmission(0x40);
-    g_Wire.write(0x12);
-    g_Wire.write(0x34);
-    g_Wire.write(0x56);
-    g_Wire.endTransmission(false);
-    g_Wire.requestFrom(0x40, 2);
-    rxData[0] = g_Wire.read();
-    rxData[1] = g_Wire.read();
+    LOG("== Test Valve ==\n");
 
-    LOG("rxData = [ 0x%02x, 0x%02x ]\n", rxData[0], rxData[1]);
+    LOG("# WhoAmI\n");
+
+    Setup();
+    g_TxData[0] = 0x80;
+    I2cReadWrite(DeviceAddress, g_TxData, 1, g_RxData, 1, &g_RxSize);
+    PrintResult();
+
+    delay(TransactionIntervalMilliSeconds);
+
+    LOG("# GetEncoderValue 1\n");
+
+    Setup();
+    g_TxData[0] = 0x00;
+    I2cReadWrite(DeviceAddress, g_TxData, 1, g_RxData, 1, &g_RxSize);
+    PrintResult();
+
+    delay(TransactionIntervalMilliSeconds);
+
+    LOG("# GetEncoderValue 4\n");
+
+    Setup();
+    g_TxData[0] = 0x00;
+    I2cReadWrite(DeviceAddress, g_TxData, 1, g_RxData, 4, &g_RxSize);
+    PrintResult();
+
+    delay(TransactionIntervalMilliSeconds);
+
+    LOG("# SetReverse 1\n");
+
+    Setup();
+    g_TxData[0] = 0x10;
+    g_TxData[1] = 0x01;
+    I2cReadWrite(DeviceAddress, g_TxData, 2, nullptr, 0, nullptr);
+    PrintResult();
+
+    delay(TransactionIntervalMilliSeconds);
+
+    LOG("# SetReverse 4\n");
+
+    Setup();
+    g_TxData[0] = 0x10;
+    g_TxData[1] = 0x01;
+    g_TxData[2] = 0x01;
+    g_TxData[3] = 0x01;
+    g_TxData[4] = 0x01;
+    I2cReadWrite(DeviceAddress, g_TxData, 5, nullptr, 0, nullptr);
+    PrintResult();
+
+    delay(TransactionIntervalMilliSeconds);
+
+    LOG("Done.\n");
 }
 
 void setup()
@@ -168,8 +210,9 @@ void setup()
 
     g_Wire.begin();
 
-    I2cTest();
-    //debugI2c();
+    //I2cTest();
+    TestValve();
+
     return;
 
     int result = g_Valve.Initialize(g_Wire, Valve::I2cAddress);
