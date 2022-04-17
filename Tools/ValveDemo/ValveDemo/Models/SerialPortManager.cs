@@ -18,6 +18,10 @@ namespace ValveDemo.Models
             m_SerialPort.ReadTimeout = 1000;
             m_SerialPort.Encoding = Encoding.UTF8;
 
+            // SeeeduinoXAIO の USB-CDC と通信する場合は以下の設定が必須。
+            // 設定していない場合全く受信できなくなる。
+            m_SerialPort.RtsEnable = true;
+
             m_SerialPort.Open();
         }
 
