@@ -12,7 +12,7 @@ class ConsoleImpl
 {
 public:
     static const int RECEIVE_BUFFER_SIZE = 64;
-    static const int SEND_BUFFER_SIZE = 64;
+    static const int SEND_BUFFER_SIZE = 128;
 
     ConsoleImpl()
      : m_pUartHandle(nullptr)

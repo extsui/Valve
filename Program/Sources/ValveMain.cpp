@@ -68,6 +68,25 @@ extern "C" void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     g_SamplingCount++;
 }
 
+// TODO: Utils 系 (共通ファイルにまとめるべきかも)
+
+static inline void ABORT_NO_MESSAGE() { while (1); }
+
+#define LOG(format, ...) Console::Log(format, __VA_ARGS__)
+
+#define ABORT() \
+    LOG("Abort: file %s, line %d\n", __FILE__, __LINE__); \
+    ABORT_NO_MESSAGE()
+
+#define __ASSERT(expr, file, line)                  \
+	LOG("Assertion failed: %s, file %s, line %d\n", \
+		expr, file, line),                          \
+	ABORT_NO_MESSAGE()
+
+#define ASSERT(expr)                              \
+    ((expr) ? ((void)0) :                         \
+    (void)(__ASSERT(#expr, __FILE__, __LINE__)))
+
 // TODO: デバッグ用に static を付けてない
 volatile int g_RxBufferCount = 0;
 volatile int g_TxBufferCount = 0;
@@ -79,6 +98,87 @@ volatile bool g_IsReadyTx = false;
 
 // I2C トランザクションが完了した場合に ON
 volatile bool g_TransactionCompleted = false;
+
+void ClearBuffer(void)
+{
+    g_RxBufferCount = 0;
+    g_TxBufferCount = 0;
+    std::memset(const_cast<uint8_t*>(g_RxBuffer), 0, sizeof(g_RxBuffer));
+    std::memset(const_cast<uint8_t*>(g_TxBuffer), 0, sizeof(g_TxBuffer));
+}
+
+/**
+ * @brief I2C スレーブ受信完了ハンドラ
+ * 
+ * - スレーブ受信のみの場合:
+ *   - StopCondition 後に呼び出される
+ * - スレーブ受信後送信の場合:
+ *   - RestartCondition 後のアドレス一致後に呼び出される
+ *   - この場合 StopCondition 後には呼び出されない
+ * 
+ * @param pOutTxData マスタに送信するデータ
+ * @param pOutTxSize マスタに送信するサイズ (送信しない場合は 0 を設定すること)
+ * @param pRxData マスタから受信したデータ
+ * @param rxSize マスタから受信したサイズ
+ * @return int 
+ */
+int OnReceivedHandler(uint8_t *pOutTxData, int *pOutTxSize, const uint8_t *pRxData, int rxSize)
+{
+    ASSERT(pOutTxData != nullptr);
+    ASSERT(pOutTxSize != nullptr);
+    ASSERT(rxSize >= 1);
+
+    *pOutTxSize = 0;
+
+    // 受信ケース
+    // TORIAEZU: マスタに送信する途中で NACK を返されて強制中断した異常系は未対応
+    // 
+    // - WhoAmI
+    //   - M->S: [ 0x80 ]
+    //   - M<-S: [ 0xAA ]
+    // - GetEncoderValue
+    //   - M->S: [ 0x00 ]
+    //   - M<-S: [ 0xhh 0xhh 0xhh 0xhh ]
+    // - SetReverse
+    //   - M->S: [ 0x10 0xbb 0xbb 0xbb 0xbb ]
+    //   - M<-S: []
+
+    uint8_t operationId = pRxData[0];
+    switch (operationId) {
+    case 0x80:
+        if (rxSize != 1) {
+            return -2;
+        }
+        *pOutTxSize = 1;
+        pOutTxData[0] = 0xAA;
+        return 0;
+
+    case 0x00:
+        if (rxSize != 1) {
+            return -2;
+        }
+        *pOutTxSize = 4;
+        for (int i = 0; i < RotaryEncoderCount; i++) {
+            pOutTxData[i] = static_cast<uint8_t>(g_RotaryEncoder[i].GetPosition());
+        }
+        return 0;
+
+    case 0x10:
+        if (rxSize != 5) {
+            return -2;
+        }
+        *pOutTxSize = 0;
+        for (int i = 0; i < RotaryEncoderCount; i++) {
+            if (pRxData[i + 1] == 0x01) {
+                g_RotaryEncoder[i].SetReverse();
+            }
+        }
+        return 0;
+
+    default:
+        return -1;
+    }
+}
 
 // アドレス一致時点で呼び出される
 extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
@@ -105,7 +205,7 @@ extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDi
         LED_DEBUG(3);
 
         // 送信開始はメインコンテキストから行う
-        // それまではクロックストレッチが効くハズ (要確認)
+        // それまではクロックストレッチが効く
         g_IsReadyTx = true;
     }
 }
@@ -130,9 +230,6 @@ extern "C" void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     // (4) 1byte 送信完了タイミング
     LED_DEBUG(4);
-
-    g_TxBufferCount++;
-    HAL_I2C_Slave_Seq_Transmit_IT(hi2c, (uint8_t*)&g_TxBuffer[g_TxBufferCount], 1, I2C_NEXT_FRAME);
 }
 
 extern "C" void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
@@ -219,25 +316,46 @@ void ValveMain()
                 continue;
             }
 
-            // TODO: 受信のみの場合の解析と処理を合わせたい
-            // TORIAEZU: 受信後送信のケースのみ実装しておく
-            g_TxBufferCount = 0;
-            g_TxBuffer[0] = 0x11;
-            g_TxBuffer[1] = 0x22;
-            g_TxBuffer[2] = 0x33;
-            g_TxBuffer[3] = 0x44;
-            HAL_I2C_Slave_Seq_Transmit_IT(&hi2c1, (uint8_t*)g_TxBuffer, 1, I2C_NEXT_FRAME);
+            // TORIEAZU: 受信解析が遅れた場合、次の受信が始まってしまうと受信バッファが上書きされるが未対処。
+
+            int txSize = 0;
+            auto result = OnReceivedHandler(
+                const_cast<uint8_t*>(g_TxBuffer),
+                &txSize,
+                const_cast<uint8_t*>(g_RxBuffer),
+                g_RxBufferCount
+            );
+            
+            if ((result == 0) && (txSize >= 1)) {
+                ASSERT(txSize < sizeof(g_TxBuffer));
+                g_TxBufferCount = txSize;
+                HAL_I2C_Slave_Seq_Transmit_IT(&hi2c1, (uint8_t*)g_TxBuffer, txSize, I2C_NEXT_FRAME);
+            }
         }
 
         // I2C トランザクション 1 回が完了した後のサマリー表示
         if (g_TransactionCompleted) {
             g_TransactionCompleted = false;
 
+            if (g_TxBufferCount == 0) {
+                int txSize = 0;
+                auto result = OnReceivedHandler(
+                    const_cast<uint8_t*>(g_TxBuffer),
+                    &txSize,
+                    const_cast<uint8_t*>(g_RxBuffer),
+                    g_RxBufferCount
+                );
+                // 送信データは設定されないはず
+                ASSERT(txSize == 0);
+            }
+
             Console::Log("R=%d [ ", g_RxBufferCount);
             for (int i = 0; i < g_RxBufferCount; i++) {
                 Console::Log("0x%02x ", g_RxBuffer[i]);
             }
             Console::Log("]\n");
+
+            ClearBuffer();
         }
 
         if (g_SamplingCount % 50 == 0) {
