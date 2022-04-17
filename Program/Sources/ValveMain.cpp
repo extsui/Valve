@@ -169,8 +169,15 @@ int OnReceivedHandler(uint8_t *pOutTxData, int *pOutTxSize, const uint8_t *pRxDa
         }
         *pOutTxSize = 0;
         for (int i = 0; i < RotaryEncoderCount; i++) {
-            if (pRxData[i + 1] == 0x01) {
-                g_RotaryEncoder[i].SetReverse();
+            switch (pRxData[i + 1]) {
+            case 0x00:
+                g_RotaryEncoder[i].SetReverse(false);
+                break;
+            case 0x01:
+                g_RotaryEncoder[i].SetReverse(true);
+                break;
+            default:
+                return -2;
             }
         }
         return 0;
@@ -349,11 +356,13 @@ void ValveMain()
                 ASSERT(txSize == 0);
             }
 
-            Console::Log("R=%d [ ", g_RxBufferCount);
-            for (int i = 0; i < g_RxBufferCount; i++) {
-                Console::Log("0x%02x ", g_RxBuffer[i]);
-            }
-            Console::Log("]\n");
+            #if I2C_DEBUG
+                Console::Log("R=%d [ ", g_RxBufferCount);
+                for (int i = 0; i < g_RxBufferCount; i++) {
+                    Console::Log("0x%02x ", g_RxBuffer[i]);
+                }
+                Console::Log("]\n");
+            #endif
 
             ClearBuffer();
         }

@@ -17,9 +17,9 @@ void RotaryEncoder::SetPortPin(PortPin *phaseA, PortPin *phaseB)
     m_phaseB.Pin  = phaseB->Pin;
 }
 
-void RotaryEncoder::SetReverse()
+void RotaryEncoder::SetReverse(bool value)
 {
-    m_IsReversed = true;
+    m_IsReversed = value;
 }
 
 void RotaryEncoder::Sample()

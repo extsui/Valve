@@ -36,7 +36,7 @@ public:
 
     void SetPortPin(PortPin *phaseA, PortPin *phaseB);
 
-    void SetReverse();
+    void SetReverse(bool value = true);
 
     // A/B 相のサンプリング
     // ポーリング方式なのでノイズ除去が適切に働く周期で呼び出すこと
