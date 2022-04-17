@@ -199,6 +199,47 @@ void TestValve()
     LOG("Done.\n");
 }
 
+void TestValveLoop()
+{
+    constexpr int TransactionIntervalMilliSeconds = 50;
+
+    LOG("== Test Valve Loop ==\n");
+
+    LOG("# WhoAmI\n");
+
+    Setup();
+    g_TxData[0] = 0x80;
+    I2cReadWrite(DeviceAddress, g_TxData, 1, g_RxData, 1, &g_RxSize);
+
+    LOG("# SetReverse\n");
+
+    Setup();
+    g_TxData[0] = 0x10;
+    g_TxData[1] = 0x01;
+    g_TxData[2] = 0x01;
+    g_TxData[3] = 0x01;
+    g_TxData[4] = 0x01;
+    I2cReadWrite(DeviceAddress, g_TxData, 5, nullptr, 0, nullptr);
+
+    LOG("# GetEncoderValue Loop\n");
+    for (int i = 0; i < 10000; i++) {
+        Setup();
+        g_TxData[0] = 0x00;
+        I2cReadWrite(DeviceAddress, g_TxData, 1, g_RxData, 4, &g_RxSize);
+        LOG("%d  %d  %d  %d  %d\n",
+            millis(),
+            static_cast<int8_t>(g_RxData[0]),
+            static_cast<int8_t>(g_RxData[1]),
+            static_cast<int8_t>(g_RxData[2]),
+            static_cast<int8_t>(g_RxData[3])
+        );
+        
+        delay(TransactionIntervalMilliSeconds);
+    }
+
+    LOG("Done.\n");
+}
+
 void setup()
 {
     // XIAO の Serial は USB-CDC 用
@@ -211,7 +252,8 @@ void setup()
     g_Wire.begin();
 
     //I2cTest();
-    TestValve();
+    //TestValve();
+    TestValveLoop();
 
     return;
 
