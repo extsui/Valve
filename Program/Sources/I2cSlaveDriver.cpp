@@ -1,180 +1,210 @@
-#if 0
-
+#include "Utils.h"
 #include "I2cSlaveDriver.h"
 
-//#ifdef I2C_SLAVE_DRIVER_DEBUG
-#include "Console.h"
-//#endif
+#include "stm32l0xx_hal_i2c.h"
 
 #include <string.h>
 
 namespace {
 
-// TORIAEZU: アドレスは適当
-I2cSlaveDriver m_Impl(0x20);
+volatile int g_RxBufferCount = 0;
+volatile int g_TxBufferCount = 0;
+volatile uint8_t g_RxBuffer[8];
+volatile uint8_t g_TxBuffer[8];
+
+// 送信準備出来たか
+volatile bool g_IsReadyTx = false;
+
+// I2C トランザクションが完了した場合に ON
+volatile bool g_TransactionCompleted = false;
+
+void ClearBuffer(void)
+{
+    g_RxBufferCount = 0;
+    g_TxBufferCount = 0;
+    std::memset(const_cast<uint8_t*>(g_RxBuffer), 0, sizeof(g_RxBuffer));
+    std::memset(const_cast<uint8_t*>(g_TxBuffer), 0, sizeof(g_TxBuffer));
+}
 
 }
 
-/**
- * スレーブ受信割り込みロック
- */
-class I2cSlaveLock
+void I2cSlaveDriver::Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, OnReceivedHandler callback) noexcept
 {
-private:
-    I2C_HandleTypeDef *m_pI2cHandle;
+    ASSERT(pHandle != nullptr);
+    ASSERT(callback != nullptr);
 
-public:
-    // スレーブ受信割り込み禁止
-    I2cSlaveLock(I2C_HandleTypeDef *pI2cHandle)
-        : m_pI2cHandle(pI2cHandle)
-    {
-        // 受信完了割り込み、アドレス一致割り込み、STOP 検出割り込み、エラー割り込み
-        m_pI2cHandle->Instance->CR1 &= ~(I2C_CR1_RXIE | I2C_CR1_ADDRIE | I2C_CR1_STOPIE | I2C_CR1_ERRIE);
-    }
-
-    // スレーブ受信割り込み許可
-    ~I2cSlaveLock()
-    {
-        m_pI2cHandle->Instance->CR1 |=  (I2C_CR1_RXIE | I2C_CR1_ADDRIE | I2C_CR1_STOPIE | I2C_CR1_ERRIE);
-    }
-};
-
-I2cSlaveDriver::I2cSlaveDriver(uint8_t ownAddress)
-    : m_OwnAddress(ownAddress)
-{
-    //ASSERT((1 <= ownAddress) && (ownAddress <= 127));
-    //ASSERT(g_Instance == NULL);
-    m_ReceiveCount = 0;
-
-    // --------------------------------------------------
-    // I2C1 BSP の初期化 (HAL_I2C_MspInit() から流用)
-    // --------------------------------------------------
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    // I2C1 GPIO Configuration
-    // PA9     ------> I2C1_SCL
-    // PA10     ------> I2C1_SDA
-    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    // Peripheral clock enable
-    __HAL_RCC_I2C1_CLK_ENABLE();
-
-    // I2C1 interrupt Init
-    HAL_NVIC_SetPriority(I2C1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(I2C1_IRQn);
-    HAL_NVIC_SetPriority(I2C1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(I2C1_IRQn);
-
-    // --------------------------------------------------
-    // I2C1 ペリフェラルの初期化
-    // --------------------------------------------------
-    I2C_TypeDef *i2c = m_pI2cHandle->Instance;
-
-    // ペリフェラルの無効化 (各種設定は無効化中のみ設定可能)
-    i2c->CR1     &= ~I2C_CR1_PE;
-    i2c->CR1      = 0;
-    i2c->CR2      = 0;
-    i2c->OAR1     = 0;
-    i2c->OAR2     = 0;
-    i2c->TIMINGR  = 0;
-    i2c->TIMEOUTR = 0;
-    i2c->ICR      = 0;
-
-    // 受信完了割り込み、アドレス一致割り込み、STOP 検出割り込み、エラー割り込み許可
-    i2c->CR1 |=  (I2C_CR1_RXIE | I2C_CR1_ADDRIE | I2C_CR1_STOPIE | I2C_CR1_ERRIE);
-
-    // クロックストレッチ無し
-    // 参考: CPU 16MHz I2C 100kHz 受信、多重割り込み無しでストレッチ発生せずロス無し。
-    // 何らかの不具合が発生して SCL をストレッチされる方がリスキーなのでストレッチ無とする。
-    i2c->CR1  |=  I2C_CR1_NOSTRETCH;
-
-    // 受信時に ACK 応答
-    i2c->CR2  &= ~I2C_CR2_NACK;
+    m_pHandle = pHandle;
+    m_OwnAddress = ownAddress;
+    m_Callback = callback;
 
     // Own Address 1 無効化時のみ設定可能
-    i2c->OAR1 &= ~I2C_OAR1_OA1EN;
-    i2c->OAR1 |= (I2C_OAR1_OA1EN | (m_OwnAddress << 1));
-
-    // ペリフェラルの有効化
-    i2c->CR1  |=  I2C_CR1_PE;
+    pHandle->Instance->OAR1 &= ~I2C_OAR1_OA1EN;
+    pHandle->Instance->OAR1 |= (I2C_OAR1_OA1EN | (ownAddress << 1));
 }
 
 I2cSlaveDriver::~I2cSlaveDriver()
 {
     // 破棄禁止
-    //ASSERT(0);
+    ASSERT(0);
+}
+
+void I2cSlaveDriver::Listen() noexcept
+{
+    HAL_I2C_EnableListen_IT(m_pHandle);
+}
+
+void I2cSlaveDriver::Polling() noexcept
+{
+    // I2C 送信 (Master <-- Slave)
+    if (g_IsReadyTx) {
+        g_IsReadyTx = false;
+        
+        // 受信データがあったら解析
+        if (g_RxBufferCount == 0) {
+            Console::Log("[i2c] Unexpected: No received data, but ReadyTx is true.\n");
+            return;
+        }
+
+        // TORIEAZU: 受信解析が遅れた場合、次の受信が始まってしまうと受信バッファが上書きされるが未対処。
+
+        int txSize = 0;
+        auto result = m_Callback(
+            const_cast<uint8_t*>(g_TxBuffer),
+            &txSize,
+            const_cast<uint8_t*>(g_RxBuffer),
+            g_RxBufferCount
+        );
+        
+        if ((result == 0) && (txSize >= 1)) {
+            ASSERT(txSize < sizeof(g_TxBuffer));
+            g_TxBufferCount = txSize;
+            HAL_I2C_Slave_Seq_Transmit_IT(m_pHandle, (uint8_t*)g_TxBuffer, txSize, I2C_NEXT_FRAME);
+        }
+    }
+
+    // I2C トランザクション 1 回が完了した後のサマリー表示
+    if (g_TransactionCompleted) {
+        g_TransactionCompleted = false;
+
+        if (g_TxBufferCount == 0) {
+            int txSize = 0;
+            auto result = m_Callback(
+                const_cast<uint8_t*>(g_TxBuffer),
+                &txSize,
+                const_cast<uint8_t*>(g_RxBuffer),
+                g_RxBufferCount
+            );
+            // 送信データは設定されないはず
+            ASSERT(txSize == 0);
+        }
+
+        #if I2C_DEBUG
+            Console::Log("R=%d [ ", g_RxBufferCount);
+            for (int i = 0; i < g_RxBufferCount; i++) {
+                Console::Log("0x%02x ", g_RxBuffer[i]);
+            }
+            Console::Log("]\n");
+        #endif
+
+        ClearBuffer();
+    }
 }
 
 /************************************************************
  *  割り込みハンドラ
  ************************************************************/
-void I2cSlaveDriver::EventHandler() noexcept
+// アドレス一致時点で呼び出される
+extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
 {
-    I2C_TypeDef *i2c = m_pI2cHandle->Instance;
+    UNUSED(AddrMatchCode);
 
-    // アドレス一致
-    if (i2c->ISR & I2C_ISR_ADDR) {
-        i2c->ICR |= I2C_ICR_ADDRCF;
-        
-        // TODO:
+    // 対象チャンネルでない場合は終了
+    if (hi2c->Instance != I2C1) {
+        return;
     }
 
-    // 受信完了
-    if (i2c->ISR & I2C_ISR_RXNE) {
-        // バッファオーバーランは警告を表示した上で受信継続
-        // バッファオーバーラン時も RXNE を落とすためにレジスタリードは必要
-        uint8_t data = i2c->RXDR;
-        //Console::Log("[i2c] Frame.Buffer Overrun!\n");
+    if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
+        // (1) 受信開始のタイミング (Master --> Slave)
+        LED_DEBUG(1);
 
-        // TODO:
-    }
+        g_RxBufferCount = 0;
+        std::memset(const_cast<uint8_t*>(g_RxBuffer), 0, sizeof(g_RxBuffer));
+        // 何 byte 受信するか不明のため 1 byte ずつ割り込みを発生させる (応答は ACK 固定)
+        HAL_I2C_Slave_Seq_Receive_IT(hi2c, (uint8_t*)g_RxBuffer, 1, I2C_NEXT_FRAME);
 
-    // STOP 検出
-    if (i2c->ISR & I2C_ISR_STOPF) {
-        i2c->ICR |= I2C_ICR_STOPCF;
-        m_ReceiveCount++;
+    } else {
+        // (3) 送信開始のタイミング (Master <-- Slave)
+        // この時点で受信バッファは確定する
+        LED_DEBUG(3);
 
-        // TODO:
+        // 送信開始はメインコンテキストから行う
+        // それまではクロックストレッチが効く
+        g_IsReadyTx = true;
     }
 }
 
-void I2cSlaveDriver::ErrorHandler() noexcept
+// データ受信が完了したタイミングで呼び出される (Master to Slave)
+extern "C" void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)      
 {
-    I2C_TypeDef *i2c = m_pI2cHandle->Instance;
+    // (2) 1byte 受信完了タイミング
+    LED_DEBUG(2);
 
-    // バスエラー
-    if (i2c->ISR & I2C_ISR_BERR) {
-        i2c->ICR |= I2C_ICR_BERRCF;
-        Console::Log("[i2c] Bus Error!\n");
-        
-        // TODO:
+    // バッファオーバーラン対策
+    // 溢れたら最終バイトを上書きし続ける挙動とする
+    if (g_RxBufferCount < sizeof(g_RxBuffer) - 1) {
+        g_RxBufferCount++;
     }
+    // 何 byte 受信するか不明のため 1 byte ずつ割り込みを発生させる (応答は ACK 固定)
+    HAL_I2C_Slave_Seq_Receive_IT(hi2c, (uint8_t*)&g_RxBuffer[g_RxBufferCount], 1, I2C_NEXT_FRAME);
+}
 
-    // オーバーラン/アンダーラン
-    if (i2c->ISR & I2C_ISR_OVR) {
-        i2c->ICR |= I2C_ICR_OVRCF;
-        Console::Log("[i2c] Overrun!\n");
+// データ送信が完了したタイミングで呼び出される (Slave to Master)
+extern "C" void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+    // (4) 1byte 送信完了タイミング
+    LED_DEBUG(4);
+}
 
-        // TODO:
+extern "C" void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
+{
+    uint8_t error = HAL_I2C_GetError(hi2c);
+
+    if (error & HAL_I2C_ERROR_BERR) {
+        Console::Log("BERR\n");
+    }
+    if (error & HAL_I2C_ERROR_ARLO) {
+        Console::Log("ARLO\n");
+    }
+    if (error & HAL_I2C_ERROR_AF) {
+        // マスタ側は最終バイト受信後に NACK を返してくるので
+        // 受信時は必ずこのエラーが発生する
+        LED_DEBUG(5);
+        //Console::Log("AF\n");
+    }
+    if (error & HAL_I2C_ERROR_OVR) {
+        Console::Log("OVR\n");
+    }
+    if (error & HAL_I2C_ERROR_DMA) {
+        Console::Log("DMA\n");
+    }
+    if (error & HAL_I2C_ERROR_TIMEOUT) {
+        Console::Log("TIMEOUT\n");
+    }
+    if (error & HAL_I2C_ERROR_SIZE) {
+        Console::Log("SIZE\n");
+    }
+    if (error & HAL_I2C_ERROR_DMA_PARAM) {
+        Console::Log("DMA_PARAM\n");
     }
 }
 
-void aaa(void)
+extern "C" void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    Console::Log("I2cSlaveDriver Instance Size = %d\n", sizeof(m_Impl));
-    Console::Log("I2C_HandleTypeDef Size       = %d\n", sizeof(I2C_HandleTypeDef));
-    Console::Log("I2C_InitTypeDef Size         = %d\n", sizeof(I2C_InitTypeDef));
-}
+    LED_DEBUG(6);
 
-extern "C" void I2C1_IRQHandler(void)
-{
-    m_Impl.EventHandler();
-}
+    g_TransactionCompleted = true;
 
-#endif
+    // I2C 通信で割り込み禁止に落とされているので
+    // 通信完了時に割り込み許可に戻す必要がある
+    HAL_I2C_EnableListen_IT(hi2c);
+}
