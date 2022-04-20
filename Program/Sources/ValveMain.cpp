@@ -14,8 +14,6 @@ extern I2C_HandleTypeDef hi2c1;
 
 namespace {
 
-I2cSlaveDriver g_I2cSlaveDriver;
-
 bool g_IsEncoderInitialized = false;
 
 constexpr int RotaryEncoderCount = 4;
@@ -164,12 +162,10 @@ void ValveMain()
     g_IsEncoderInitialized = true;
 
     // I2C 受信開始
-    g_I2cSlaveDriver.Initialize(&hi2c1, 0x40, I2cReceivedHandler);
-    g_I2cSlaveDriver.Listen();
+    I2cSlaveDriver::Initialize(&hi2c1, 0x40, I2cReceivedHandler);
+    I2cSlaveDriver::Listen();
 
     while (1) {
-        g_I2cSlaveDriver.Polling();
-
         if (g_SamplingCount % 50 == 0) {
             Console::Log("%d  % 3d  % 3d  % 3d  % 3d\n",
                 g_SamplingCount,

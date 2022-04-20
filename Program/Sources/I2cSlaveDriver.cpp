@@ -12,12 +12,6 @@ volatile int g_TxBufferCount = 0;
 volatile uint8_t g_RxBuffer[8];
 volatile uint8_t g_TxBuffer[8];
 
-// 送信準備出来たか
-volatile bool g_IsReadyTx = false;
-
-// I2C トランザクションが完了した場合に ON
-volatile bool g_TransactionCompleted = false;
-
 void ClearBuffer(void)
 {
     g_RxBufferCount = 0;
@@ -26,94 +20,83 @@ void ClearBuffer(void)
     std::memset(const_cast<uint8_t*>(g_TxBuffer), 0, sizeof(g_TxBuffer));
 }
 
-}
-
-void I2cSlaveDriver::Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, OnReceivedHandler callback) noexcept
-{
-    ASSERT(!m_Initialized);
-    ASSERT(pHandle != nullptr);
-    ASSERT(callback != nullptr);
-
-    m_pHandle = pHandle;
-    m_OwnAddress = ownAddress;
-    m_Callback = callback;
-
-    // Own Address 1 無効化時のみ設定可能
-    pHandle->Instance->OAR1 &= ~I2C_OAR1_OA1EN;
-    pHandle->Instance->OAR1 |= (I2C_OAR1_OA1EN | (ownAddress << 1));
-
-    m_Initialized = true;
-}
-
-I2cSlaveDriver::~I2cSlaveDriver()
-{
-    // 破棄禁止
-    ASSERT(0);
-}
-
-void I2cSlaveDriver::Listen() noexcept
-{
-    ASSERT(m_Initialized);
-    HAL_I2C_EnableListen_IT(m_pHandle);
-}
-
-void I2cSlaveDriver::Polling() noexcept
-{
-    ASSERT(m_Initialized);
-
-    // I2C 送信 (Master <-- Slave)
-    if (g_IsReadyTx) {
-        g_IsReadyTx = false;
-        
-        // 受信データがあったら解析
-        if (g_RxBufferCount == 0) {
-            Console::Log("[i2c] Unexpected: No received data, but ReadyTx is true.\n");
-            return;
-        }
-
-        // TORIEAZU: 受信解析が遅れた場合、次の受信が始まってしまうと受信バッファが上書きされるが未対処。
-
-        int txSize = 0;
-        auto result = m_Callback(
-            const_cast<uint8_t*>(g_TxBuffer),
-            &txSize,
-            const_cast<uint8_t*>(g_RxBuffer),
-            g_RxBufferCount
-        );
-        
-        if ((result == 0) && (txSize >= 1)) {
-            ASSERT(txSize < sizeof(g_TxBuffer));
-            g_TxBufferCount = txSize;
-            HAL_I2C_Slave_Seq_Transmit_IT(m_pHandle, (uint8_t*)g_TxBuffer, txSize, I2C_NEXT_FRAME);
-        }
+class I2cSlaveDriverImpl
+{  
+public:
+    I2cSlaveDriverImpl()
+     : m_Initialized(false)
+     , m_pHandle(nullptr)
+     , m_OwnAddress(0)
+     , m_OnReceivedHandler(nullptr)
+    {   
     }
 
-    // I2C トランザクション 1 回が完了した後のサマリー表示
-    if (g_TransactionCompleted) {
-        g_TransactionCompleted = false;
+    ~I2cSlaveDriverImpl() = default;
+    
+    /**
+     * @brief I2C スレーブドライバの初期化
+     * 
+     * @param pHandle I2C ハンドル
+     * @param ownAddress 自身のアドレス (スレーブアドレス)
+     * @param callback Polling で呼び出される受信コールバック
+     */
+    void Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, I2cSlaveDriver::OnReceivedHandler onReceivedHandler) noexcept
+    {
+        ASSERT(!m_Initialized);
+        ASSERT(pHandle != nullptr);
+        ASSERT(onReceivedHandler != nullptr);
 
-        if (g_TxBufferCount == 0) {
-            int txSize = 0;
-            auto result = m_Callback(
-                const_cast<uint8_t*>(g_TxBuffer),
-                &txSize,
-                const_cast<uint8_t*>(g_RxBuffer),
-                g_RxBufferCount
-            );
-            // 送信データは設定されないはず
-            ASSERT(txSize == 0);
-        }
+        m_pHandle = pHandle;
+        m_OwnAddress = ownAddress;
+        m_OnReceivedHandler = onReceivedHandler;
 
-        #if I2C_DEBUG
-            Console::Log("R=%d [ ", g_RxBufferCount);
-            for (int i = 0; i < g_RxBufferCount; i++) {
-                Console::Log("0x%02x ", g_RxBuffer[i]);
-            }
-            Console::Log("]\n");
-        #endif
+        // Own Address 1 無効化時のみ設定可能
+        pHandle->Instance->OAR1 &= ~I2C_OAR1_OA1EN;
+        pHandle->Instance->OAR1 |= (I2C_OAR1_OA1EN | (ownAddress << 1));
 
-        ClearBuffer();
+        m_Initialized = true;
     }
+
+    /**
+     * @brief I2C 受信の開始
+     */
+    void Listen() noexcept
+    {
+        ASSERT(m_Initialized);
+        HAL_I2C_EnableListen_IT(m_pHandle);
+    }
+
+    /**
+     * @brief コールバックのラッパー
+     */
+    int OnReceive(uint8_t *pOutTxData, int *pOutTxSize, const uint8_t *pRxData, int rxSize)
+    {
+        return m_OnReceivedHandler(pOutTxData, pOutTxSize, pRxData, rxSize);
+    }
+
+private:
+    bool m_Initialized;
+    I2C_HandleTypeDef *m_pHandle;
+    uint8_t m_OwnAddress;
+    I2cSlaveDriver::OnReceivedHandler m_OnReceivedHandler;
+};
+
+I2cSlaveDriverImpl g_Impl;
+
+}
+
+namespace I2cSlaveDriver {
+
+void Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, OnReceivedHandler onReceivedHandler) noexcept
+{
+    g_Impl.Initialize(pHandle, ownAddress, onReceivedHandler);
+}
+
+void Listen() noexcept
+{
+    g_Impl.Listen();
+}
+
 }
 
 /************************************************************
@@ -143,9 +126,26 @@ extern "C" void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDi
         // この時点で受信バッファは確定する
         LED_DEBUG(3);
 
-        // 送信開始はメインコンテキストから行う
-        // それまではクロックストレッチが効く
-        g_IsReadyTx = true;
+        if (g_RxBufferCount == 0) {
+            return;
+        }
+
+        // 割り込みハンドラ上で受信解析する。
+        // 重すぎる場合はメインコンテキストに処理を移譲すること。
+        // この割り込みハンドラ中はクロックストレッチが有効。
+        int txSize = 0;
+        auto result = g_Impl.OnReceive(
+            const_cast<uint8_t*>(g_TxBuffer),
+            &txSize,
+            const_cast<uint8_t*>(g_RxBuffer),
+            g_RxBufferCount
+        );
+        
+        if ((result == 0) && (txSize >= 1)) {
+            ASSERT(txSize < sizeof(g_TxBuffer));
+            g_TxBufferCount = txSize;
+            HAL_I2C_Slave_Seq_Transmit_IT(hi2c, (uint8_t*)g_TxBuffer, txSize, I2C_NEXT_FRAME);
+        }
     }
 }
 
@@ -208,7 +208,30 @@ extern "C" void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     LED_DEBUG(6);
 
-    g_TransactionCompleted = true;
+    {
+        if (g_TxBufferCount == 0) {
+            int txSize = 0;
+            auto result = g_Impl.OnReceive(
+                const_cast<uint8_t*>(g_TxBuffer),
+                &txSize,
+                const_cast<uint8_t*>(g_RxBuffer),
+                g_RxBufferCount
+            );
+            // 送信データは設定されないはず
+            ASSERT(txSize == 0);
+        }
+
+        #if I2C_DEBUG
+            // I2C トランザクション 1 回が完了した後のサマリー表示
+            Console::Log("R=%d [ ", g_RxBufferCount);
+            for (int i = 0; i < g_RxBufferCount; i++) {
+                Console::Log("0x%02x ", g_RxBuffer[i]);
+            }
+            Console::Log("]\n");
+        #endif
+
+        ClearBuffer();
+    }
 
     // I2C 通信で割り込み禁止に落とされているので
     // 通信完了時に割り込み許可に戻す必要がある
