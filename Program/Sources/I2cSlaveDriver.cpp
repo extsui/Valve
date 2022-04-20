@@ -30,6 +30,7 @@ void ClearBuffer(void)
 
 void I2cSlaveDriver::Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, OnReceivedHandler callback) noexcept
 {
+    ASSERT(!m_Initialized);
     ASSERT(pHandle != nullptr);
     ASSERT(callback != nullptr);
 
@@ -40,6 +41,8 @@ void I2cSlaveDriver::Initialize(I2C_HandleTypeDef *pHandle, uint8_t ownAddress, 
     // Own Address 1 無効化時のみ設定可能
     pHandle->Instance->OAR1 &= ~I2C_OAR1_OA1EN;
     pHandle->Instance->OAR1 |= (I2C_OAR1_OA1EN | (ownAddress << 1));
+
+    m_Initialized = true;
 }
 
 I2cSlaveDriver::~I2cSlaveDriver()
@@ -50,11 +53,14 @@ I2cSlaveDriver::~I2cSlaveDriver()
 
 void I2cSlaveDriver::Listen() noexcept
 {
+    ASSERT(m_Initialized);
     HAL_I2C_EnableListen_IT(m_pHandle);
 }
 
 void I2cSlaveDriver::Polling() noexcept
 {
+    ASSERT(m_Initialized);
+
     // I2C 送信 (Master <-- Slave)
     if (g_IsReadyTx) {
         g_IsReadyTx = false;

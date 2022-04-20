@@ -19,7 +19,8 @@ class I2cSlaveDriver
 {  
 public:
     I2cSlaveDriver()
-     : m_pHandle(nullptr)
+     : m_Initialized(false)
+     , m_pHandle(nullptr)
      , m_OwnAddress(0)
      , m_Callback(nullptr)
     {   
@@ -58,8 +59,7 @@ public:
     void Polling() noexcept;
 
 private:
-    // TODO: m_Initialized の追加および各種操作に ASSERT の追加
-
+    bool m_Initialized;
     I2C_HandleTypeDef *m_pHandle;
     uint8_t m_OwnAddress;
     OnReceivedHandler m_Callback;
