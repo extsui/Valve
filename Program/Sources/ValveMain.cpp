@@ -6,16 +6,17 @@
 
 #include <string.h>
 
-#include "stm32l0xx_hal_tim.h"
 #include "stm32l0xx_hal_i2c.h"
+#include "stm32l0xx_hal_cortex.h" // HAL_SYSTICK_Callback
 
 extern UART_HandleTypeDef huart2;
-extern TIM_HandleTypeDef htim2;
 extern I2C_HandleTypeDef hi2c1;
 
 namespace {
 
 I2cSlaveDriver g_I2cSlaveDriver;
+
+bool g_IsEncoderInitialized = false;
 
 constexpr int RotaryEncoderCount = 4;
 
@@ -55,8 +56,12 @@ RotaryEncoderPortPin RotaryEncoderPortPinSettings[] =
 
 }
 
-extern "C" void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+extern "C" void HAL_SYSTICK_Callback(void)
 {
+    if (!g_IsEncoderInitialized) {
+        return;
+    }
+
     for (auto& rotaryEncoder : g_RotaryEncoder) {
         rotaryEncoder.Sample();
     }
@@ -148,23 +153,21 @@ void ValveMain()
     Console::SetPort(&huart2);
     Console::Log("Valve Start.\n");
 
-    g_I2cSlaveDriver.Initialize(&hi2c1, 0x40, I2cReceivedHandler);
-    g_I2cSlaveDriver.Listen();
-
     for (int i = 0; i < RotaryEncoderCount; i++) {
         auto setting = &RotaryEncoderPortPinSettings[i];
         g_RotaryEncoder[i].SetPortPin(&setting->PhaseA, &setting->PhaseB);
-
         // 今回作成した評価基板ではエンコーダ向きが逆のため
         g_RotaryEncoder[i].SetReverse();
-
+        // 初期サンプリング
         g_RotaryEncoder[i].Sample();
     }
+    g_IsEncoderInitialized = true;
 
-    HAL_TIM_Base_Start_IT(&htim2);
+    // I2C 受信開始
+    g_I2cSlaveDriver.Initialize(&hi2c1, 0x40, I2cReceivedHandler);
+    g_I2cSlaveDriver.Listen();
 
     while (1) {
-
         g_I2cSlaveDriver.Polling();
 
         if (g_SamplingCount % 50 == 0) {
